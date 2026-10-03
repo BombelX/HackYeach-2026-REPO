@@ -35,7 +35,10 @@ class Processor:
         self.times = deque(maxlen=128)
         self.history = []
         self.prior = self.bpm = None
+        self.bpm_updated_at = None
+        self.bpm_stale = False
         self.last_sample = 0
+        self.last_inference = None
         self.count = self.since_job = 0
         self.box = self.target = None
         self.fs = self.elapsed = 0
@@ -45,9 +48,11 @@ class Processor:
         self.frames.clear()
         self.times.clear()
         self.history.clear()
-        self.prior = self.bpm = None
+        self.prior = None
+        self.bpm_stale = self.bpm is not None
         self.fs = self.elapsed = 0
         self.since_job = 0
+        self.last_inference = None
 
     def process(self, frame, now):
         # Limit resolution before running detectors on untrusted remote frames.
@@ -69,8 +74,6 @@ class Processor:
         else:
             self.box = self.target.copy() if self.box is None else self.box + 0.2 * (self.target - self.box)
             if self.model is not None and now - self.last_sample >= 0.9 / self.args.fps:
-                if self.times and now - self.times[-1] > 0.25:
-                    self.reset()
                 x, y, w, h = map(int, self.box)
                 x1, y1 = max(0, x - w // 4), max(0, y - h // 4)
                 x2, y2 = min(frame.shape[1], x + w + w // 4), min(frame.shape[0], y + h + h // 4)
@@ -79,18 +82,22 @@ class Processor:
                 self.times.append(now)
                 self.last_sample = now
                 self.since_job += 1
-                if len(self.frames) >= self.args.min_frames and self.since_job >= self.args.stride:
+                if (len(self.frames) >= self.args.min_frames
+                        and (self.last_inference is None or now - self.last_inference >= 0.5 - 1e-9)):
                     self.infer()
+                    self.last_inference = now
                     self.since_job = 0
             x, y, w, h = map(int, self.box)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         if self.analyzer:
             self.analyzer.draw(frame)
         result = dict(timestamp=time.time(), face_detected=self.box is not None,
-                      heart_rate_bpm=self.bpm, sampling_fps=self.fs, window_seconds=self.elapsed,
+                      heart_rate_bpm=self.bpm, heart_rate_stale=self.bpm_stale,
+                      heart_rate_updated_at=self.bpm_updated_at,
+                      sampling_fps=self.fs, window_seconds=self.elapsed,
                       posture=self.analyzer.posture if self.analyzer else None,
                       expression=self.analyzer.expression if self.analyzer else None,
-                      status='preview' if self.model is None else ('measuring' if self.bpm is not None else 'warming_up'))
+                      status='preview' if self.model is None else ('stale' if self.bpm_stale else ('measuring' if self.bpm is not None else 'warming_up')))
         return frame, result
 
     def infer(self):
@@ -113,9 +120,14 @@ class Processor:
         self.elapsed = float(t[-1] - t[0])
         pulse = np.interp(np.linspace(t[0], t[-1], len(t)), t, p)
         bpm = estimate_bpm(pulse, (len(t) - 1) / self.elapsed, self.prior)
-        if bpm is not None:
+        if bpm is None:
+            self.prior = None
+            self.bpm_stale = self.bpm is not None
+        else:
             self.prior = bpm
-            self.bpm = bpm if self.bpm is None else 0.7 * self.bpm + 0.3 * bpm
+            self.bpm = bpm if self.bpm is None or self.bpm_stale else 0.7 * self.bpm + 0.3 * bpm
+            self.bpm_updated_at = time.time()
+            self.bpm_stale = False
 
     def close(self):
         if self.analyzer:
@@ -353,7 +365,7 @@ def parse_args(argv=None):
     parser.add_argument('--face-model', type=Path, default=ROOT / 'models/face_landmarker.task')
     parser.add_argument('--fps', type=float, default=30)
     parser.add_argument('--window', type=float, default=10)
-    parser.add_argument('--stride', type=int, default=10)
+    parser.add_argument('--stride', type=int, default=1, help='legacy option; updates now run every 0.5 seconds')
     parser.add_argument('--min-frames', type=int, default=32)
     parser.add_argument('--threads', type=int, default=4)
     parser.add_argument('--max-sessions', type=int, default=4)

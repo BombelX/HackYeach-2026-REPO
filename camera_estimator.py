@@ -42,7 +42,12 @@ def estimate_bpm(predictions, fs, prior=None, track_width=15.0):
     With a prior (previous BPM), pick the peak within +/- track_width BPM of it,
     unless a much stronger peak exists elsewhere (lock lost, so re-acquire).
     """
-    pulse = np.cumsum(np.asarray(predictions, dtype=np.float64))
+    values = np.asarray(predictions, dtype=np.float64)
+    # Frequency-grid padding cannot replace sufficient observation time.
+    if (values.ndim != 1 or len(values) < 16 or not np.isfinite(values).all()
+            or not np.isfinite(fs) or fs <= 6.6 or (len(values) - 1) / fs < 5):
+        return None
+    pulse = np.cumsum(values)
     n = len(pulse)
     d = sparse.diags([np.ones(n - 2), -2 * np.ones(n - 2), np.ones(n - 2)],
                      [0, 1, 2], shape=(n - 2, n), format='csc')
@@ -54,12 +59,19 @@ def estimate_bpm(predictions, fs, prior=None, track_width=15.0):
     frequencies, power = signal.periodogram(filtered, fs=fs, window='hann',
                                             nfft=max(2048, 2 ** (n - 1).bit_length()))
     mask = (frequencies >= 0.75) & (frequencies <= 2.5)
-    best = np.argmax(power[mask])
-    if prior is not None:
-        near = mask & (np.abs(frequencies * 60 - prior) <= track_width)
-        if near.any() and power[near].max() * 3 >= power[mask][best]:
-            return float(frequencies[near][np.argmax(power[near])] * 60)
-    return float(frequencies[mask][best] * 60)
+    # Track local peaks, not bins on a stronger peak's slope.
+    peaks, _ = signal.find_peaks(power)
+    peaks = peaks[mask[peaks]]
+    if not len(peaks) or not np.isfinite(power).all() or power[peaks].max() <= 0:
+        return None
+    best = peaks[np.argmax(power[peaks])]
+    if prior is not None and np.isfinite(prior):
+        near = peaks[np.abs(frequencies[peaks] * 60 - prior) <= track_width]
+        if len(near):
+            tracked = near[np.argmax(power[near])]
+            if power[tracked] * 3 >= power[best]:
+                best = tracked
+    return float(frequencies[best] * 60)
 
 
 def load_model(toolbox, weights, device):
@@ -215,10 +227,6 @@ def inference_worker(model, device, jobs, results, stop, window_seconds):
             model.poolspa = torch.nn.AdaptiveAvgPool3d((n, 1, 1))
             with torch.inference_mode():
                 prediction = model(tensor.to(device))[0].cpu().numpy().ravel()
-            # A gap means the capture was reset, so old history is unrelated.
-            if last_time is not None and times[0] - last_time > 2.5 / fs:
-                history = []
-                prior = None
             # Windows overlap: the newest prediction replaces older ones
             # for the same instants, then the new window is appended.
             history = [h for h in history if h[0] < times[0]]
@@ -230,8 +238,7 @@ def inference_worker(model, device, jobs, results, stop, window_seconds):
             elapsed = t[-1] - t[0]
             uniform = np.linspace(t[0], t[-1], len(t))
             bpm = estimate_bpm(np.interp(uniform, t, p), (len(t) - 1) / elapsed, prior)
-            if bpm is not None:
-                prior = bpm
+            prior = bpm
             results.put((bpm, fs, elapsed, None))
     except Exception as exc:
         results.put((None, 0, 0, str(exc)))
@@ -247,8 +254,8 @@ def main():
     parser.add_argument('--fps', type=float, default=30, help='maximum model sampling rate; does not change camera settings')
     parser.add_argument('--preview-only', action='store_true', help='show camera video without model inference to diagnose capture issues')
     parser.add_argument('--window', type=float, default=10, help='max seconds of pulse history used for each estimate')
-    parser.add_argument('--stride', type=int, default=10, help='frames between updates (smaller = more frequent, more compute)')
-    parser.add_argument('--seed-bpm', type=float, default=72, help='placeholder BPM shown (marked with ~) until the first real reading; 0 disables')
+    parser.add_argument('--stride', type=int, default=1, help='legacy option; updates now run every 0.5 seconds')
+    parser.add_argument('--seed-bpm', type=float, default=0, help='placeholder BPM shown (marked with ~) until the first real reading; 0 disables')
     parser.add_argument('--min-frames', type=int, default=32, help='frames needed before the first estimate (multiple of 4; smaller = faster but rougher)')
     parser.add_argument('--pose-model', type=Path, default=ROOT / 'models/pose_landmarker_lite.task')
     parser.add_argument('--face-model', type=Path, default=ROOT / 'models/face_landmarker.task')
@@ -305,6 +312,7 @@ def main():
     bpm, shown_bpm, measured_fs, elapsed = None, None, 0, 0
     real_reading = False  # False while the displayed number is only the placeholder
     last_result = last_sample = 0
+    last_job = None
     print(f'Using {weights} on {args.device}. Keep still in steady lighting; press q to exit.')
     try:
         while not stop.is_set():
@@ -335,17 +343,10 @@ def main():
                 frames.clear()
                 timestamps.clear()
                 since_job = 0
-                bpm = shown_bpm = None
-                real_reading = False
+                last_job = None
+                bpm = None
                 recent.clear()
             elif not args.preview_only and now - last_sample >= 0.9 / args.fps:
-                if timestamps and now - timestamps[-1] > 0.25:
-                    frames.clear()
-                    timestamps.clear()
-                    since_job = 0
-                    bpm = shown_bpm = None
-                    real_reading = False
-                    recent.clear()
                 x, y, w, h = map(int, box)
                 # Toolbox's enlarged face box (coefficient 1.5), clipped to image.
                 x1, y1 = max(0, x - w // 4), max(0, y - h // 4)
@@ -355,13 +356,14 @@ def main():
                 timestamps.append(now)
                 last_sample = now
                 since_job += 1
-                # Sliding window: after the first 128 frames, run again every
-                # `stride` new frames on the most recent 128.
-                if len(frames) >= args.min_frames and since_job >= args.stride:
+                # Update from the rolling frame buffer at most twice per second.
+                if (len(frames) >= args.min_frames
+                        and (last_job is None or now - last_job >= 0.5 - 1e-9)):
                     n = len(frames) // 4 * 4  # model needs a multiple of 4
                     try:
                         jobs.put_nowait((list(frames)[-n:], np.asarray(timestamps)[-n:]))
                         since_job = 0
+                        last_job = now
                     except queue.Full:
                         pass  # Worker is busy; retry on the next frame.
             while not results.empty():
@@ -369,6 +371,8 @@ def main():
                 if error:
                     raise RuntimeError(f'Inference failed: {error}')
                 last_result = now
+                if bpm is None:
+                    recent.clear()
                 if bpm is not None:
                     # Light smoothing so the live number doesn't jitter. The first
                     # real reading blends away from the placeholder instead of jumping.

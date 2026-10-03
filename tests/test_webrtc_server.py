@@ -1,5 +1,6 @@
 import asyncio
 import unittest
+from unittest.mock import Mock
 
 from aiohttp.test_utils import TestClient, TestServer
 from aiortc import RTCConfiguration, RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
@@ -10,6 +11,34 @@ from webrtc_server import Processor, create_app, parse_args
 
 
 class ProcessorTests(unittest.TestCase):
+    def test_half_second_updates_preserve_frames_across_gaps(self):
+        args = parse_args(['--preview-only', '--no-analysis'])
+        processor = Processor(args)
+        processor.model = object()
+        processor.detector = Mock()
+        processor.detector.detectMultiScale.return_value = [(80, 80, 100, 100)]
+        windows = []
+        processor.infer = lambda: windows.append(list(processor.times))
+        frame = np.zeros((240, 320, 3), dtype=np.uint8)
+        try:
+            for i in range(140):
+                processor.process(frame.copy(), 1 + i / 30)
+            self.assertEqual(len(windows), 8)
+            self.assertEqual(len(windows[0]), args.min_frames)
+            self.assertEqual(len(windows[-1]), 128)
+            for i, window in enumerate(windows):
+                self.assertAlmostEqual(window[-1], 1 + (31 + i * 15) / 30)
+                if i:
+                    self.assertAlmostEqual(window[-1] - windows[i - 1][-1], 0.5)
+            previous_times = list(processor.times)
+            processor.history = [(1.0, 0.25)]
+            processor.process(frame.copy(), previous_times[-1] + 0.4)
+            self.assertEqual(list(processor.times)[:-1], previous_times[1:])
+            self.assertEqual(processor.history, [(1.0, 0.25)])
+            self.assertEqual(len(windows), 9)
+        finally:
+            processor.close()
+
     def test_physnet_inference_and_reset(self):
         args = parse_args(['--no-analysis', '--device', 'cpu'])
         torch.set_num_threads(2)
@@ -22,9 +51,23 @@ class ProcessorTests(unittest.TestCase):
             processor.infer()
             self.assertAlmostEqual(processor.fs, 30)
             self.assertTrue(processor.history)
-            self.assertIsNotNone(processor.bpm)
+            self.assertIsNone(processor.bpm)  # One second is still warming up.
+            # Keep publishing the previous measured value during reacquisition.
+            processor.bpm = processor.prior = 72.0
+            processor.bpm_updated_at = 123.0
+            processor.infer()  # Insufficient history must not erase the reading.
+            self.assertEqual(processor.bpm, 72.0)
+            self.assertTrue(processor.bpm_stale)
+            self.assertIsNone(processor.prior)
             processor.reset()
-            self.assertIsNone(processor.bpm)
+            self.assertEqual(processor.bpm, 72.0)
+            processor.target = None
+            processor.count = 1  # Avoid running the detector on the blank test frame.
+            _, result = processor.process(np.zeros((480, 640, 3), dtype=np.uint8), 10)
+            self.assertEqual(result['heart_rate_bpm'], 72.0)
+            self.assertTrue(result['heart_rate_stale'])
+            self.assertEqual(result['heart_rate_updated_at'], 123.0)
+            self.assertEqual(result['status'], 'stale')
             self.assertEqual(processor.history, [])
         finally:
             processor.close()
