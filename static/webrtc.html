@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live camera analysis</title>
+<style>body{font:16px system-ui;max-width:1000px;margin:32px auto;padding:0 20px;background:#101722;color:#eef}video{width:46%;background:#000;border-radius:12px;transform:scaleX(-1)}button{padding:12px 24px;margin:16px 8px 16px 0}pre{white-space:pre-wrap}</style>
+<h1>Live camera analysis</h1><p>Send your camera to the server and receive annotated video and live estimates. Pulse estimates are experimental.</p>
+<button id="start">Start camera</button><button id="stop" disabled>Stop</button>
+<div><video id="local" autoplay playsinline muted></video> <video id="remote" autoplay playsinline muted></video></div>
+<pre id="results" role="status" aria-live="polite">Click Start camera to request camera access.</pre>
+<script>
+let pc, stream, socket, sessionId;
+const start = document.querySelector('#start'), stop = document.querySelector('#stop');
+const results = document.querySelector('#results');
+function cameraUnavailableReason() {
+  if (!window.isSecureContext) return 'Camera access requires HTTPS or http://localhost:8080 on the computer running the server. HTTP network addresses cannot request camera permission.';
+  if (!navigator.mediaDevices?.getUserMedia) return 'Camera access is unavailable in this browser. Open this page in a browser that supports camera capture.';
+  const policy = document.permissionsPolicy || document.featurePolicy;
+  if (policy && !policy.allowsFeature('camera')) return 'Camera access is blocked by this page’s permissions policy. Open the page directly, or allow camera access in the embedding frame.';
+  return null;
+}
+const unavailableReason = cameraUnavailableReason();
+if (unavailableReason) results.textContent = unavailableReason;
+async function shutdown() {
+  socket?.close(); pc?.close(); stream?.getTracks().forEach(t => t.stop());
+  if (sessionId) await fetch(`/api/sessions/${sessionId}`, {method:'DELETE'}).catch(() => {});
+  pc = stream = socket = sessionId = null;
+  start.disabled = false; stop.disabled = true;
+}
+start.onclick = async () => {
+  start.disabled = true; stop.disabled = true;
+  try {
+    const reason = cameraUnavailableReason();
+    if (reason) throw new Error(reason);
+    results.textContent = 'Requesting camera access. Allow camera access in your browser’s permission prompt.';
+    // Accept any available camera; capture defaults vary between browsers/devices.
+    stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    document.querySelector('#local').srcObject = stream;
+    results.textContent = 'Camera enabled. Connecting to the analysis server…';
+    // Add your STUN/TURN servers here for connections across networks.
+    pc = new RTCPeerConnection({iceServers:[]});
+    pc.ontrack = ({track}) => document.querySelector('#remote').srcObject = new MediaStream([track]);
+    stream.getTracks().forEach(track => pc.addTrack(track,stream));
+    await pc.setLocalDescription(await pc.createOffer());
+    if (pc.iceGatheringState !== 'complete') await new Promise((resolve,reject) => {
+      const timeout = setTimeout(() => reject(new Error('ICE gathering timed out')),15000);
+      pc.addEventListener('icegatheringstatechange', () => {
+        if (pc.iceGatheringState === 'complete') {clearTimeout(timeout);resolve();}
+      });
+    });
+    const response = await fetch('/api/webrtc/offer',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sdp:pc.localDescription.sdp,type:pc.localDescription.type})});
+    if (!response.ok) throw new Error(await response.text());
+    const answer = await response.json(); sessionId = answer.session_id;
+    await pc.setRemoteDescription({sdp:answer.sdp,type:answer.type});
+    const url = new URL(answer.events_url,location.href); url.protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    socket = new WebSocket(url);
+    socket.onmessage = event => results.textContent = JSON.stringify(JSON.parse(event.data),null,2);
+    socket.onerror = () => results.textContent = 'Output connection failed';
+    stop.disabled = false;
+  } catch(error) {
+    await shutdown();
+    const messages = {
+      NotAllowedError: 'Camera permission was denied or blocked. Allow camera access in your browser’s site settings, check operating system camera permissions, then click Start camera again.',
+      NotFoundError: 'Your browser could not find a camera on the device running this browser. Check that your browser or app has operating system camera access, or open this URL in a standalone browser with camera access. A camera attached to the server is not used by this page.',
+      NotReadableError: 'The camera could not be opened. Close other apps using it, check operating system camera permissions, and try again.'
+    };
+    results.textContent = messages[error.name] || error.message;
+  }
+};
+stop.onclick = async () => {stop.disabled = true;await shutdown();results.textContent='Stopped';};
+window.addEventListener('pagehide', () => {pc?.close();stream?.getTracks().forEach(t => t.stop());});
+</script></html>
