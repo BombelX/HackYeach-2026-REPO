@@ -1,6 +1,6 @@
 # Live WebRTC camera analysis
 
-The server receives a browser camera feed over WebRTC, runs the existing PhysNet pulse and MediaPipe posture/expression analysis, and returns annotated video over the same peer connection. Each session has separate models and history. Media queues keep only the newest frame so slow inference does not build a backlog. No local server camera or GUI is required.
+The server receives a browser camera feed over WebRTC, runs the existing PhysNet pulse and MediaPipe landmark detection, and returns annotated video over the same peer connection. Each session has separate models and history. Media queues keep only the newest frame so slow inference does not build a backlog. No local server camera or GUI is required.
 
 ## Run
 
@@ -23,7 +23,7 @@ venv/bin/python webrtc_server.py --ssl-cert /path/to/cert.pem --ssl-key /path/to
 
 Open `https://your-server-hostname:8080` with the hostname covered by that certificate. An HTTPS reverse proxy also works. If camera permission was previously denied, allow it in the browser's site settings and click **Start camera** again. An embedded page also needs camera permission from its containing page.
 
-Default assets are in `models/` and `rPPG-Toolbox/final_model_release/`. Override with `--weights`, `--pose-model`, or `--face-model`. `--no-analysis` disables MediaPipe; `--preview-only` disables pulse estimation. Results use `null` until an actual heart-rate estimate is available; there are no placeholder BPM values. Estimates are experimental, not medical measurements.
+Default assets are in `models/` and `rPPG-Toolbox/final_model_release/`. Override with `--weights`, `--pose-model`, or `--face-model`. `--no-analysis` disables MediaPipe landmark detection; `--preview-only` disables pulse estimation. Results use `null` until an actual heart-rate estimate is available; there are no placeholder BPM values. Estimates are experimental, not medical measurements.
 
 ## Input and output endpoints
 
@@ -48,12 +48,14 @@ Example output:
   "heart_rate_bpm": 72.3,
   "sampling_fps": 29.8,
   "window_seconds": 8.5,
-  "posture": "upright",
-  "expression": "neutral"
+  "frame_width": 640,
+  "frame_height": 480,
+  "landmarks": {"pose": [], "face": []},
+  "landmarks_timestamp_ms": 123456
 }
 ```
 
-Status values include `waiting`, `warming_up`, `measuring`, `stale`, `preview`, `ended`, `error`, and `closed`. Disabled posture/expression fields are `null`. Losing the face clears pulse history but retains the last measured heart rate. Dropped frames and sampling gaps preserve the rolling queue; timestamps are used to interpolate missing samples. Output marks it with `heart_rate_stale: true`, status `stale`, and `heart_rate_updated_at` (Unix seconds of its last update). Each processed frame continues to publish this value until fresh measurements resume. Before the first measurement, BPM remains `null`; ended/closed/error sessions clear it. Polling an unknown/deleted/expired session returns 404. Active sessions are limited by `--max-sessions` (default 4), and their lifetime by `--session-timeout` (default 3600 seconds).
+Status values include `waiting`, `warming_up`, `measuring`, `stale`, `preview`, `ended`, `error`, and `closed`. Disabled landmark detection returns `landmarks: null`. Losing the face clears pulse history but retains the last measured heart rate. Dropped frames and sampling gaps preserve the rolling queue; timestamps are used to interpolate missing samples. Output marks it with `heart_rate_stale: true`, status `stale`, and `heart_rate_updated_at` (Unix seconds of its last update). Each processed frame continues to publish this value until fresh measurements resume. Before the first measurement, BPM remains `null`; ended/closed/error sessions clear it. Polling an unknown/deleted/expired session returns 404. Active sessions are limited by `--max-sessions` (default 4), and their lifetime by `--session-timeout` (default 3600 seconds).
 
 Remote browser camera access requires HTTPS (localhost works with HTTP). Across networks, configure reachable STUN/TURN servers on both the browser and server, e.g. `--ice-servers '[{"urls":"stun:stun.example.com:3478"}]'`, and allow WebRTC UDP traffic or use TURN. The included demo defaults to host candidates only. The API has no authentication; bind `--host 127.0.0.1` for local use or put it behind your application's authenticated HTTPS proxy before exposing it publicly. Session IDs grant access to session output.
 
@@ -94,7 +96,7 @@ maintains separate capture and inference history for each session.
    Select a local spectral peak in 45–150 BPM. Prefer a peak within 15 BPM of the
    previous estimate only if its power is at least one third of the strongest peak.
 7. **Publish:** the server smooths accepted BPM values with a 0.3 update weight and
-   returns JSON via polling/WebSocket. Face loss clears history; missing frames do not restart the queue. Posture and expression run separately; they do not validate BPM.
+   returns JSON via polling/WebSocket. Face loss clears history; missing frames do not restart the queue. Landmark detection runs separately; it does not validate BPM.
 
 ### Implemented reliability changes
 
@@ -150,3 +152,23 @@ updates can occur less often. WebRTC may drop incoming frames when processing
 cannot keep up; these drops do not clear the rolling pulse queue. Long gaps are
 interpolated too, so fresh estimates after a prolonged interruption may be less
 reliable even though the queue is retained.
+
+## Landmark JSON
+
+No posture or facial-expression classification is performed, and face blendshape
+scores are disabled. `landmarks.pose` and `landmarks.face` contain the first
+detected person's complete MediaPipe landmark lists. Each point has `index`,
+`x`, `y`, and `z`, plus `visibility`/`presence` when supplied by MediaPipe.
+`x` and `y` are normalized image coordinates: pixel coordinates are
+`x * frame_width` and `y * frame_height` on the returned video. Coordinates can
+extend outside the image; `z` is MediaPipe's relative depth, not meters.
+A missing pose/face has an empty list. Detection runs every third processed frame;
+`landmarks_timestamp_ms` identifies the detection time on the stream's monotonic
+clock, and points are retained between detection updates. For example:
+
+```json
+{"landmarks": {"pose": [{"index": 0, "x": 0.5, "y": 0.3, "z": -0.1, "visibility": 0.99}], "face": []}}
+```
+
+The example contains one point for brevity; actual results include all detected
+landmarks. The browser displays the full JSON automatically.

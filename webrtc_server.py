@@ -19,7 +19,7 @@ import cv2
 import numpy as np
 import torch
 
-from camera_estimator import ROOT, PostureExpression, estimate_bpm, load_face_detector, load_model, normalize_frames
+from camera_estimator import ROOT, LandmarkDetector, estimate_bpm, load_face_detector, load_model, normalize_frames
 
 LOG = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class Processor:
         self.args = args
         self.detector = load_face_detector(args.toolbox)
         self.model = None if args.preview_only else load_model(args.toolbox, args.weights, args.device)
-        self.analyzer = None if args.no_analysis else PostureExpression(args.pose_model, args.face_model)
+        self.analyzer = None if args.no_analysis else LandmarkDetector(args.pose_model, args.face_model)
         self.frames = deque(maxlen=128)
         self.times = deque(maxlen=128)
         self.history = []
@@ -95,8 +95,9 @@ class Processor:
                       heart_rate_bpm=self.bpm, heart_rate_stale=self.bpm_stale,
                       heart_rate_updated_at=self.bpm_updated_at,
                       sampling_fps=self.fs, window_seconds=self.elapsed,
-                      posture=self.analyzer.posture if self.analyzer else None,
-                      expression=self.analyzer.expression if self.analyzer else None,
+                      landmarks=self.analyzer.points if self.analyzer else None,
+                      landmarks_timestamp_ms=self.analyzer.timestamp_ms if self.analyzer else None,
+                      frame_width=frame.shape[1], frame_height=frame.shape[0],
                       status='preview' if self.model is None else ('stale' if self.bpm_stale else ('measuring' if self.bpm is not None else 'warming_up')))
         return frame, result
 

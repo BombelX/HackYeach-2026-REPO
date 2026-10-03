@@ -8,7 +8,7 @@ Press q or Escape to exit. Estimates are experimental, not medical measurements.
 import argparse
 from collections import deque
 import importlib.util
-import math
+import json
 from pathlib import Path
 import queue
 import sys
@@ -102,11 +102,8 @@ def load_face_detector(toolbox):
     raise RuntimeError(f'Could not load a face cascade. Checked: {searched}')
 
 
-class PostureExpression:
-    """Posture and facial-expression labels from MediaPipe landmarkers.
-
-    mediapipe is imported lazily so the rest of the script works without it.
-    """
+class LandmarkDetector:
+    """Detect raw MediaPipe pose and face landmarks without assigning labels."""
 
     def __init__(self, pose_path, face_path):
         import mediapipe as mp
@@ -118,89 +115,42 @@ class PostureExpression:
             running_mode=vision.RunningMode.VIDEO))
         self.face = vision.FaceLandmarker.create_from_options(vision.FaceLandmarkerOptions(
             base_options=mp_python.BaseOptions(model_asset_path=str(face_path)),
-            running_mode=vision.RunningMode.VIDEO, output_face_blendshapes=True))
-        self.baseline = None  # upright head-to-shoulder ratio, set with the 'c' key
-        self.ratio = None
-        self.posture, self.expression = 'no body', 'no face'
-        self.pose_pts = None   # {'ear': [l, r], 'shoulder': [l, r]} in pixels
-        self.face_pts = None   # {'mouth_corners': [...], 'lips': [...], 'brows': [...]} in pixels
+            running_mode=vision.RunningMode.VIDEO, output_face_blendshapes=False))
+        self.points = {'pose': [], 'face': []}
+        self.timestamp_ms = None
+
+    @staticmethod
+    def serialize(landmarks):
+        points = []
+        for index, landmark in enumerate(landmarks):
+            point = dict(index=index, x=float(landmark.x), y=float(landmark.y),
+                         z=float(landmark.z))
+            for field in ('visibility', 'presence'):
+                value = getattr(landmark, field, None)
+                if value is not None:
+                    point[field] = float(value)
+            points.append(point)
+        return points
 
     def analyze(self, frame_bgr, ts_ms):
-        h, w = frame_bgr.shape[:2]
         image = self.mp.Image(image_format=self.mp.ImageFormat.SRGB,
                               data=cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
-        # Posture: shoulder tilt, head tilt, and head-to-shoulder distance.
         pose = self.pose.detect_for_video(image, ts_ms)
-        if pose.pose_landmarks:
-            lm = pose.pose_landmarks[0]
-            pt = lambda i: np.array([lm[i].x * w, lm[i].y * h])
-            l_ear, r_ear, l_sh, r_sh = pt(7), pt(8), pt(11), pt(12)
-            tilt = lambda a, b: math.degrees(math.atan2(a[1] - b[1], a[0] - b[0]))
-            shoulder_tilt = abs(tilt(l_sh, r_sh))
-            shoulder_tilt = min(shoulder_tilt, 180 - shoulder_tilt)
-            head_tilt = abs(tilt(l_ear, r_ear))
-            head_tilt = min(head_tilt, 180 - head_tilt)
-            shoulder_width = np.linalg.norm(l_sh - r_sh) + 1e-6
-            # Bigger = head held higher above the shoulders; drops when slouching.
-            self.ratio = ((l_sh + r_sh) / 2 - (l_ear + r_ear) / 2)[1] / shoulder_width
-            issues = []
-            if shoulder_tilt > 8:
-                issues.append('shoulders uneven')
-            if head_tilt > 12:
-                issues.append('head tilted')
-            if self.baseline and self.ratio < 0.85 * self.baseline:
-                issues.append('slouching')
-            self.posture = ', '.join(issues) if issues else 'upright'
-            self.pose_pts = {'ear': [l_ear, r_ear], 'shoulder': [l_sh, r_sh]}
-        else:
-            self.ratio, self.posture, self.pose_pts = None, 'no body', None
-        # Expression: rule-based labels from blendshape scores.
         face = self.face.detect_for_video(image, ts_ms)
-        if face.face_blendshapes:
-            mesh = face.face_landmarks[0]
-            fp = lambda ids: [(int(mesh[i].x * w), int(mesh[i].y * h)) for i in ids]
-            # Face-mesh points behind each blendshape: smile -> mouth corners,
-            # jawOpen -> inner lips, browDown/browInnerUp -> brows.
-            self.face_pts = {'mouth_corners': fp((61, 291)), 'lips': fp((13, 14)),
-                             'brows': fp((107, 336, 105, 334))}
-            sc = {c.category_name: c.score for c in face.face_blendshapes[0]}
-            smile = (sc['mouthSmileLeft'] + sc['mouthSmileRight']) / 2
-            brow_down = (sc['browDownLeft'] + sc['browDownRight']) / 2
-            if smile > 0.5:
-                self.expression = 'smiling'
-            elif sc['jawOpen'] > 0.4 and sc['browInnerUp'] > 0.4:
-                self.expression = 'surprised'
-            elif brow_down > 0.5:
-                self.expression = 'frowning'
-            else:
-                self.expression = 'neutral'
-        else:
-            self.expression, self.face_pts = 'no face', None
+        self.points = {
+            'pose': self.serialize(pose.pose_landmarks[0]) if pose.pose_landmarks else [],
+            'face': self.serialize(face.face_landmarks[0]) if face.face_landmarks else [],
+        }
+        self.timestamp_ms = ts_ms
 
     def draw(self, frame):
-        """Dots on the landmarks each label is based on; active ones are larger."""
-        if self.pose_pts:
-            ok = self.posture == 'upright'
-            color = (0, 200, 0) if ok else (0, 0, 255)  # green = upright, red = problem
-            ear = [tuple(map(int, q)) for q in self.pose_pts['ear']]
-            sh = [tuple(map(int, q)) for q in self.pose_pts['shoulder']]
-            cv2.line(frame, sh[0], sh[1], color, 2)   # shoulder line (tilt)
-            cv2.line(frame, ear[0], ear[1], color, 2)  # ear line (head tilt)
-            for q in ear + sh:
-                cv2.circle(frame, q, 6, color, -1)
-            mid_sh = ((sh[0][0] + sh[1][0]) // 2, (sh[0][1] + sh[1][1]) // 2)
-            mid_ear = ((ear[0][0] + ear[1][0]) // 2, (ear[0][1] + ear[1][1]) // 2)
-            cv2.line(frame, mid_ear, mid_sh, color, 1)  # head-to-shoulder distance (slouch)
-        if self.face_pts:
-            active = {'smiling': 'mouth_corners', 'surprised': 'lips',
-                      'frowning': 'brows'}.get(self.expression)
-            for group, pts in self.face_pts.items():
-                hot = group == active
-                for q in pts:
-                    cv2.circle(frame, q, 5 if hot else 3,
-                               (0, 255, 255) if hot else (200, 200, 200), -1)
-                    if hot:
-                        cv2.circle(frame, q, 8, (0, 255, 255), 1)
+        h, w = frame.shape[:2]
+        for group, points in self.points.items():
+            for point in points:
+                center = (int(point['x'] * w), int(point['y'] * h))
+                radius = 3 if group == 'pose' else 1
+                cv2.circle(frame, center, radius + 1, (0, 0, 0), -1)
+                cv2.circle(frame, center, radius, (255, 255, 0), -1)
 
 
 def inference_worker(model, device, jobs, results, stop, window_seconds):
@@ -259,7 +209,7 @@ def main():
     parser.add_argument('--min-frames', type=int, default=32, help='frames needed before the first estimate (multiple of 4; smaller = faster but rougher)')
     parser.add_argument('--pose-model', type=Path, default=ROOT / 'models/pose_landmarker_lite.task')
     parser.add_argument('--face-model', type=Path, default=ROOT / 'models/face_landmarker.task')
-    parser.add_argument('--no-analysis', action='store_true', help='disable posture and expression detection')
+    parser.add_argument('--no-analysis', action='store_true', help='disable landmark detection')
     parser.add_argument('--threads', type=int, default=4, help='PyTorch CPU threads')
     args = parser.parse_args()
     if args.fps <= 6.6 or args.window < 5 or args.threads < 1 or args.stride < 1:
@@ -293,12 +243,12 @@ def main():
     if not args.no_analysis:
         missing = [str(m) for m in (args.pose_model, args.face_model) if not m.is_file()]
         if missing:
-            print('Posture/expression disabled; model files not found: ' + ', '.join(missing))
+            print('Landmark detection disabled; model files not found: ' + ', '.join(missing))
         else:
             try:
-                analyzer = PostureExpression(args.pose_model, args.face_model)
+                analyzer = LandmarkDetector(args.pose_model, args.face_model)
             except ImportError:
-                print('Posture/expression disabled; install it with: pip install mediapipe')
+                print('Landmark detection disabled; install it with: pip install mediapipe')
     jobs, results, stop = queue.Queue(maxsize=1), queue.Queue(), threading.Event()
     worker = threading.Thread(target=inference_worker,
         args=(model, args.device, jobs, results, stop, args.window), daemon=True)
@@ -323,7 +273,7 @@ def main():
             # Own the display buffer instead of drawing on backend-owned memory.
             frame = frame.copy()
             frame = cv2.flip(frame, 1)
-            # Posture/expression every 3rd frame to leave CPU for PhysNet.
+            # Detect landmarks every third frame to leave CPU for PhysNet.
             if analyzer is not None and count % 3 == 0:
                 analyzer.analyze(frame, int(now * 1000))
             if count % 15 == 0:
@@ -381,10 +331,12 @@ def main():
                     weight = 0.3 if real_reading else 0.5
                     shown_bpm = median_bpm if shown_bpm is None else (1 - weight) * shown_bpm + weight * median_bpm
                     real_reading = True
-                    posture = analyzer.posture if analyzer is not None else 'disabled'
-                    expression = analyzer.expression if analyzer is not None else 'disabled'
-                    print(f'Posture: {posture} | Expression: {expression} | '
-                          f'Heart rate: {shown_bpm:.1f} BPM | capture: {measured_fs:.1f} FPS')
+                    print(json.dumps({
+                        'heart_rate_bpm': shown_bpm,
+                        'sampling_fps': measured_fs,
+                        'landmarks': analyzer.points if analyzer is not None else None,
+                        'landmarks_timestamp_ms': analyzer.timestamp_ms if analyzer is not None else None,
+                    }))
             # Until the first real reading, show a placeholder so the display never sits empty.
             if (not real_reading and box is not None and args.seed_bpm > 0
                     and not args.preview_only):
@@ -399,9 +351,6 @@ def main():
             key = cv2.waitKey(1) & 0xFF
             if key in (ord('q'), 27):
                 break
-            if key == ord('c') and analyzer is not None and analyzer.ratio is not None:
-                analyzer.baseline = analyzer.ratio
-                print('Upright posture calibrated')
         while not results.empty():
             error = results.get_nowait()[3]
             if error:

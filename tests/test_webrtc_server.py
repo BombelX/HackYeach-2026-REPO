@@ -1,6 +1,10 @@
 import asyncio
 import unittest
 from unittest.mock import Mock
+from types import SimpleNamespace
+import json
+
+from camera_estimator import LandmarkDetector
 
 from aiohttp.test_utils import TestClient, TestServer
 from aiortc import RTCConfiguration, RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
@@ -11,6 +15,27 @@ from webrtc_server import Processor, create_app, parse_args
 
 
 class ProcessorTests(unittest.TestCase):
+    def test_landmarks_json_without_classification(self):
+        points = LandmarkDetector.serialize([
+            SimpleNamespace(x=0.5, y=0.25, z=-0.1, visibility=0.9, presence=None)])
+        self.assertEqual(points, [dict(index=0, x=0.5, y=0.25, z=-0.1, visibility=0.9)])
+        processor = Processor(parse_args(['--preview-only', '--no-analysis']))
+        processor.analyzer = Mock()
+        processor.analyzer.points = {'pose': points, 'face': []}
+        processor.analyzer.timestamp_ms = 1000
+        processor.count = 1
+        try:
+            _, result = processor.process(np.zeros((240, 320, 3), dtype=np.uint8), 1)
+            self.assertEqual(result['landmarks']['pose'], points)
+            self.assertEqual(result['landmarks']['face'], [])
+            self.assertEqual(result['landmarks_timestamp_ms'], 1000)
+            self.assertEqual(result['frame_width'], 320)
+            self.assertNotIn('posture', result)
+            self.assertNotIn('expression', result)
+            json.dumps(result)
+        finally:
+            processor.close()
+
     def test_half_second_updates_preserve_frames_across_gaps(self):
         args = parse_args(['--preview-only', '--no-analysis'])
         processor = Processor(args)
