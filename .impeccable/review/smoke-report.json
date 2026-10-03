@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "checks": [
+    "Login validation and password toggle",
+    "SMS validation",
+    "Manual transfer and account validation",
+    "Review and warning",
+    "Both warning answers",
+    "Camera consent and local preview with simulated camera",
+    "Camera persists across routes and stops at logout",
+    "Parameters initially collapsed",
+    "Keyboard skip link preserves dashboard/transfer/warning and focuses content",
+    "No overflow at 375/768/1024/1440 on five screens",
+    "No browser runtime errors"
+  ],
+  "screenshots": [
+    "desktop-login.png",
+    "desktop-sms.png",
+    "desktop-dashboard.png",
+    "desktop-transfer.png",
+    "desktop-warning.png",
+    "mobile-login.png",
+    "mobile-sms.png",
+    "mobile-dashboard.png",
+    "mobile-transfer.png",
+    "mobile-warning.png"
+  ]
+}
