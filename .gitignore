@@ -1,0 +1,17 @@
+node_modules/
+dist/
+web/dist/
+__pycache__/
+.venv/
+venv/
+*.pyc
+.env
+data/
+*.sqlite
+*.sqlite-journal
+.DS_Store
+Thumbs.db
+.vscode/
+*.webm
+*.mp4
+.cache/
