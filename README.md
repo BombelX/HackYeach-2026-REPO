@@ -85,3 +85,9 @@ cd server
 ## vast.ai
 
 Trening modeli nie jest w tej aplikacji. Zbieranie danych trzymaj na laptopie + tunel. Na vast.ai rezerwuj 400–500 GB dysku z góry (nie da się potem powiększyć).
+
+## Struktura repozytorium
+
+- `web/` — frontend aplikacji badania i panel admina
+- `server/` — API, zapis zdarzeń i eksport danych
+- `scripts/` — skrypty pomocnicze do uruchamiania lokalnego
