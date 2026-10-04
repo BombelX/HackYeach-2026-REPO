@@ -1,0 +1,768 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-03T16:15:52.928702Z",
+  "title": "Design System: Bank24 / SafeTransfer",
+  "extensions": {
+    "colorMeta": {
+      "navy": {
+        "role": "primary",
+        "displayName": "Bank Navy",
+        "canonical": "#152b4b",
+        "tonalRamp": [
+          "oklch(15% 0.06525 257.81)",
+          "oklch(26.4% 0.06525 257.81)",
+          "oklch(37.9% 0.06525 257.81)",
+          "oklch(49.3% 0.06525 257.81)",
+          "oklch(60.7% 0.06525 257.81)",
+          "oklch(72.1% 0.06525 257.81)",
+          "oklch(83.6% 0.06525 257.81)",
+          "oklch(95% 0.06525 257.81)"
+        ]
+      },
+      "navy-hover": {
+        "role": "primary",
+        "displayName": "Bank Navy Hover",
+        "canonical": "#234168",
+        "tonalRamp": [
+          "oklch(15% 0.07651 255.69)",
+          "oklch(26.4% 0.07651 255.69)",
+          "oklch(37.9% 0.07651 255.69)",
+          "oklch(49.3% 0.07651 255.69)",
+          "oklch(60.7% 0.07651 255.69)",
+          "oklch(72.1% 0.07651 255.69)",
+          "oklch(83.6% 0.07651 255.69)",
+          "oklch(95% 0.07651 255.69)"
+        ]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Interaction Teal",
+        "canonical": "#08786a",
+        "tonalRamp": [
+          "oklch(15% 0.09106 180.80)",
+          "oklch(26.4% 0.09106 180.80)",
+          "oklch(37.9% 0.09106 180.80)",
+          "oklch(49.3% 0.09106 180.80)",
+          "oklch(60.7% 0.09106 180.80)",
+          "oklch(72.1% 0.09106 180.80)",
+          "oklch(83.6% 0.09106 180.80)",
+          "oklch(95% 0.09106 180.80)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Bank Ink",
+        "canonical": "#172d4d",
+        "tonalRamp": [
+          "oklch(15% 0.06493 257.78)",
+          "oklch(26.4% 0.06493 257.78)",
+          "oklch(37.9% 0.06493 257.78)",
+          "oklch(49.3% 0.06493 257.78)",
+          "oklch(60.7% 0.06493 257.78)",
+          "oklch(72.1% 0.06493 257.78)",
+          "oklch(83.6% 0.06493 257.78)",
+          "oklch(95% 0.06493 257.78)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Slate Support",
+        "canonical": "#5b6b7d",
+        "tonalRamp": [
+          "oklch(15% 0.03449 251.53)",
+          "oklch(26.4% 0.03449 251.53)",
+          "oklch(37.9% 0.03449 251.53)",
+          "oklch(49.3% 0.03449 251.53)",
+          "oklch(60.7% 0.03449 251.53)",
+          "oklch(72.1% 0.03449 251.53)",
+          "oklch(83.6% 0.03449 251.53)",
+          "oklch(95% 0.03449 251.53)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Divider Mist",
+        "canonical": "#dae2eb",
+        "tonalRamp": [
+          "oklch(15% 0.01502 251.17)",
+          "oklch(26.4% 0.01502 251.17)",
+          "oklch(37.9% 0.01502 251.17)",
+          "oklch(49.3% 0.01502 251.17)",
+          "oklch(60.7% 0.01502 251.17)",
+          "oklch(72.1% 0.01502 251.17)",
+          "oklch(83.6% 0.01502 251.17)",
+          "oklch(95% 0.01502 251.17)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White Surface",
+        "canonical": "#fff",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26.4% 0.00000 0.00)",
+          "oklch(37.9% 0.00000 0.00)",
+          "oklch(49.3% 0.00000 0.00)",
+          "oklch(60.7% 0.00000 0.00)",
+          "oklch(72.1% 0.00000 0.00)",
+          "oklch(83.6% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Cool Canvas",
+        "canonical": "#f7f9fc",
+        "tonalRamp": [
+          "oklch(15% 0.00453 258.32)",
+          "oklch(26.4% 0.00453 258.32)",
+          "oklch(37.9% 0.00453 258.32)",
+          "oklch(49.3% 0.00453 258.32)",
+          "oklch(60.7% 0.00453 258.32)",
+          "oklch(72.1% 0.00453 258.32)",
+          "oklch(83.6% 0.00453 258.32)",
+          "oklch(95% 0.00453 258.32)"
+        ]
+      },
+      "camera": {
+        "role": "neutral",
+        "displayName": "Camera White",
+        "canonical": "#fff",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26.4% 0.00000 0.00)",
+          "oklch(37.9% 0.00000 0.00)",
+          "oklch(49.3% 0.00000 0.00)",
+          "oklch(60.7% 0.00000 0.00)",
+          "oklch(72.1% 0.00000 0.00)",
+          "oklch(83.6% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "success": {
+        "role": "functional",
+        "displayName": "Calm Green",
+        "canonical": "#216148",
+        "tonalRamp": [
+          "oklch(15% 0.07747 164.00)",
+          "oklch(26.4% 0.07747 164.00)",
+          "oklch(37.9% 0.07747 164.00)",
+          "oklch(49.3% 0.07747 164.00)",
+          "oklch(60.7% 0.07747 164.00)",
+          "oklch(72.1% 0.07747 164.00)",
+          "oklch(83.6% 0.07747 164.00)",
+          "oklch(95% 0.07747 164.00)"
+        ]
+      },
+      "success-bg": {
+        "role": "functional",
+        "displayName": "Green Status Surface",
+        "canonical": "#edf6f0",
+        "tonalRamp": [
+          "oklch(15% 0.01238 157.00)",
+          "oklch(26.4% 0.01238 157.00)",
+          "oklch(37.9% 0.01238 157.00)",
+          "oklch(49.3% 0.01238 157.00)",
+          "oklch(60.7% 0.01238 157.00)",
+          "oklch(72.1% 0.01238 157.00)",
+          "oklch(83.6% 0.01238 157.00)",
+          "oklch(95% 0.01238 157.00)"
+        ]
+      },
+      "amber": {
+        "role": "functional",
+        "displayName": "Pause Amber",
+        "canonical": "#865310",
+        "tonalRamp": [
+          "oklch(15% 0.10156 66.78)",
+          "oklch(26.4% 0.10156 66.78)",
+          "oklch(37.9% 0.10156 66.78)",
+          "oklch(49.3% 0.10156 66.78)",
+          "oklch(60.7% 0.10156 66.78)",
+          "oklch(72.1% 0.10156 66.78)",
+          "oklch(83.6% 0.10156 66.78)",
+          "oklch(95% 0.10156 66.78)"
+        ]
+      },
+      "amber-bg": {
+        "role": "functional",
+        "displayName": "Amber Pause Surface",
+        "canonical": "#fff4e3",
+        "tonalRamp": [
+          "oklch(15% 0.02534 78.92)",
+          "oklch(26.4% 0.02534 78.92)",
+          "oklch(37.9% 0.02534 78.92)",
+          "oklch(49.3% 0.02534 78.92)",
+          "oklch(60.7% 0.02534 78.92)",
+          "oklch(72.1% 0.02534 78.92)",
+          "oklch(83.6% 0.02534 78.92)",
+          "oklch(95% 0.02534 78.92)"
+        ]
+      },
+      "error": {
+        "role": "functional",
+        "displayName": "Form Red",
+        "canonical": "#a22f36",
+        "tonalRamp": [
+          "oklch(15% 0.15048 21.59)",
+          "oklch(26.4% 0.15048 21.59)",
+          "oklch(37.9% 0.15048 21.59)",
+          "oklch(49.3% 0.15048 21.59)",
+          "oklch(60.7% 0.15048 21.59)",
+          "oklch(72.1% 0.15048 21.59)",
+          "oklch(83.6% 0.15048 21.59)",
+          "oklch(95% 0.15048 21.59)"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "#b8c6d7",
+        "tonalRamp": [
+          "oklch(15% 0.02844 253.27)",
+          "oklch(26.4% 0.02844 253.27)",
+          "oklch(37.9% 0.02844 253.27)",
+          "oklch(49.3% 0.02844 253.27)",
+          "oklch(60.7% 0.02844 253.27)",
+          "oklch(72.1% 0.02844 253.27)",
+          "oklch(83.6% 0.02844 253.27)",
+          "oklch(95% 0.02844 253.27)"
+        ]
+      },
+      "field-border-hover": {
+        "role": "neutral",
+        "displayName": "Hover Stroke",
+        "canonical": "#8297ae",
+        "tonalRamp": [
+          "oklch(15% 0.04178 250.82)",
+          "oklch(26.4% 0.04178 250.82)",
+          "oklch(37.9% 0.04178 250.82)",
+          "oklch(49.3% 0.04178 250.82)",
+          "oklch(60.7% 0.04178 250.82)",
+          "oklch(72.1% 0.04178 250.82)",
+          "oklch(83.6% 0.04178 250.82)",
+          "oklch(95% 0.04178 250.82)"
+        ]
+      },
+      "field-placeholder": {
+        "role": "neutral",
+        "displayName": "Readable Placeholder",
+        "canonical": "#647285",
+        "tonalRamp": [
+          "oklch(15% 0.03418 256.08)",
+          "oklch(26.4% 0.03418 256.08)",
+          "oklch(37.9% 0.03418 256.08)",
+          "oklch(49.3% 0.03418 256.08)",
+          "oklch(60.7% 0.03418 256.08)",
+          "oklch(72.1% 0.03418 256.08)",
+          "oklch(83.6% 0.03418 256.08)",
+          "oklch(95% 0.03418 256.08)"
+        ]
+      },
+      "button-secondary-hover": {
+        "role": "neutral",
+        "displayName": "Secondary Hover Surface",
+        "canonical": "#f3f7fc",
+        "tonalRamp": [
+          "oklch(15% 0.00793 253.85)",
+          "oklch(26.4% 0.00793 253.85)",
+          "oklch(37.9% 0.00793 253.85)",
+          "oklch(49.3% 0.00793 253.85)",
+          "oklch(60.7% 0.00793 253.85)",
+          "oklch(72.1% 0.00793 253.85)",
+          "oklch(83.6% 0.00793 253.85)",
+          "oklch(95% 0.00793 253.85)"
+        ]
+      },
+      "chip-bg": {
+        "role": "neutral",
+        "displayName": "Demo Chip Surface",
+        "canonical": "#dfe8f2",
+        "tonalRamp": [
+          "oklch(15% 0.01667 250.85)",
+          "oklch(26.4% 0.01667 250.85)",
+          "oklch(37.9% 0.01667 250.85)",
+          "oklch(49.3% 0.01667 250.85)",
+          "oklch(60.7% 0.01667 250.85)",
+          "oklch(72.1% 0.01667 250.85)",
+          "oklch(83.6% 0.01667 250.85)",
+          "oklch(95% 0.01667 250.85)"
+        ]
+      },
+      "chip-text": {
+        "role": "neutral",
+        "displayName": "Demo Chip Text",
+        "canonical": "#445d77",
+        "tonalRamp": [
+          "oklch(15% 0.05206 249.96)",
+          "oklch(26.4% 0.05206 249.96)",
+          "oklch(37.9% 0.05206 249.96)",
+          "oklch(49.3% 0.05206 249.96)",
+          "oklch(60.7% 0.05206 249.96)",
+          "oklch(72.1% 0.05206 249.96)",
+          "oklch(83.6% 0.05206 249.96)",
+          "oklch(95% 0.05206 249.96)"
+        ]
+      },
+      "preview-bg": {
+        "role": "neutral",
+        "displayName": "Preview Neutral Mist",
+        "canonical": "#eef3f5",
+        "tonalRamp": [
+          "oklch(15% 0.00598 223.46)",
+          "oklch(26.4% 0.00598 223.46)",
+          "oklch(37.9% 0.00598 223.46)",
+          "oklch(49.3% 0.00598 223.46)",
+          "oklch(60.7% 0.00598 223.46)",
+          "oklch(72.1% 0.00598 223.46)",
+          "oklch(83.6% 0.00598 223.46)",
+          "oklch(95% 0.00598 223.46)"
+        ]
+      },
+      "preview-caption": {
+        "role": "neutral",
+        "displayName": "Preview Caption Mist",
+        "canonical": "#e8eef1",
+        "tonalRamp": [
+          "oklch(15% 0.00760 228.86)",
+          "oklch(26.4% 0.00760 228.86)",
+          "oklch(37.9% 0.00760 228.86)",
+          "oklch(49.3% 0.00760 228.86)",
+          "oklch(60.7% 0.00760 228.86)",
+          "oklch(72.1% 0.00760 228.86)",
+          "oklch(83.6% 0.00760 228.86)",
+          "oklch(95% 0.00760 228.86)"
+        ]
+      },
+      "preview-placeholder": {
+        "role": "neutral",
+        "displayName": "Preview Slate",
+        "canonical": "#516274",
+        "tonalRamp": [
+          "oklch(15% 0.03570 250.04)",
+          "oklch(26.4% 0.03570 250.04)",
+          "oklch(37.9% 0.03570 250.04)",
+          "oklch(49.3% 0.03570 250.04)",
+          "oklch(60.7% 0.03570 250.04)",
+          "oklch(72.1% 0.03570 250.04)",
+          "oklch(83.6% 0.03570 250.04)",
+          "oklch(95% 0.03570 250.04)"
+        ]
+      },
+      "tab-active": {
+        "role": "secondary",
+        "displayName": "Selected Mint Tab",
+        "canonical": "#e6f7f0",
+        "tonalRamp": [
+          "oklch(15% 0.02013 169.34)",
+          "oklch(26.4% 0.02013 169.34)",
+          "oklch(37.9% 0.02013 169.34)",
+          "oklch(49.3% 0.02013 169.34)",
+          "oklch(60.7% 0.02013 169.34)",
+          "oklch(72.1% 0.02013 169.34)",
+          "oklch(83.6% 0.02013 169.34)",
+          "oklch(95% 0.02013 169.34)"
+        ]
+      },
+      "tab-hover": {
+        "role": "neutral",
+        "displayName": "Canvas Hover Tab",
+        "canonical": "#f7f9fc",
+        "tonalRamp": [
+          "oklch(15% 0.00453 258.32)",
+          "oklch(26.4% 0.00453 258.32)",
+          "oklch(37.9% 0.00453 258.32)",
+          "oklch(49.3% 0.00453 258.32)",
+          "oklch(60.7% 0.00453 258.32)",
+          "oklch(72.1% 0.00453 258.32)",
+          "oklch(83.6% 0.00453 258.32)",
+          "oklch(95% 0.00453 258.32)"
+        ]
+      },
+      "account-subtle": {
+        "role": "neutral",
+        "displayName": "Account Subtle",
+        "canonical": "#b6c7dd",
+        "tonalRamp": [
+          "oklch(15% 0.03614 254.89)",
+          "oklch(26.4% 0.03614 254.89)",
+          "oklch(37.9% 0.03614 254.89)",
+          "oklch(49.3% 0.03614 254.89)",
+          "oklch(60.7% 0.03614 254.89)",
+          "oklch(72.1% 0.03614 254.89)",
+          "oklch(83.6% 0.03614 254.89)",
+          "oklch(95% 0.03614 254.89)"
+        ]
+      },
+      "mint": {
+        "role": "secondary",
+        "displayName": "Account Mint",
+        "canonical": "#67e8c5",
+        "tonalRamp": [
+          "oklch(15% 0.12562 172.68)",
+          "oklch(26.4% 0.12562 172.68)",
+          "oklch(37.9% 0.12562 172.68)",
+          "oklch(49.3% 0.12562 172.68)",
+          "oklch(60.7% 0.12562 172.68)",
+          "oklch(72.1% 0.12562 172.68)",
+          "oklch(83.6% 0.12562 172.68)",
+          "oklch(95% 0.12562 172.68)"
+        ]
+      },
+      "mint-hover": {
+        "role": "secondary",
+        "displayName": "Account Mint Hover",
+        "canonical": "#4bdbb2",
+        "tonalRamp": [
+          "oklch(15% 0.13620 170.26)",
+          "oklch(26.4% 0.13620 170.26)",
+          "oklch(37.9% 0.13620 170.26)",
+          "oklch(49.3% 0.13620 170.26)",
+          "oklch(60.7% 0.13620 170.26)",
+          "oklch(72.1% 0.13620 170.26)",
+          "oklch(83.6% 0.13620 170.26)",
+          "oklch(95% 0.13620 170.26)"
+        ]
+      },
+      "mint-tint": {
+        "role": "secondary",
+        "displayName": "Mint Wash",
+        "canonical": "#e6f7f0",
+        "tonalRamp": [
+          "oklch(15% 0.02013 169.34)",
+          "oklch(26.4% 0.02013 169.34)",
+          "oklch(37.9% 0.02013 169.34)",
+          "oklch(49.3% 0.02013 169.34)",
+          "oklch(60.7% 0.02013 169.34)",
+          "oklch(72.1% 0.02013 169.34)",
+          "oklch(83.6% 0.02013 169.34)",
+          "oklch(95% 0.02013 169.34)"
+        ]
+      },
+      "selection": {
+        "role": "secondary",
+        "displayName": "Mint Selection",
+        "canonical": "#e6f7f0",
+        "tonalRamp": [
+          "oklch(15% 0.02013 169.34)",
+          "oklch(26.4% 0.02013 169.34)",
+          "oklch(37.9% 0.02013 169.34)",
+          "oklch(49.3% 0.02013 169.34)",
+          "oklch(60.7% 0.02013 169.34)",
+          "oklch(72.1% 0.02013 169.34)",
+          "oklch(83.6% 0.02013 169.34)",
+          "oklch(95% 0.02013 169.34)"
+        ]
+      },
+      "camera-divider": {
+        "role": "neutral",
+        "displayName": "Camera Divider",
+        "canonical": "#ccd7e4",
+        "tonalRamp": [
+          "oklch(15% 0.02157 252.51)",
+          "oklch(26.4% 0.02157 252.51)",
+          "oklch(37.9% 0.02157 252.51)",
+          "oklch(49.3% 0.02157 252.51)",
+          "oklch(60.7% 0.02157 252.51)",
+          "oklch(72.1% 0.02157 252.51)",
+          "oklch(83.6% 0.02157 252.51)",
+          "oklch(95% 0.02157 252.51)"
+        ]
+      },
+      "camera-icon": {
+        "role": "neutral",
+        "displayName": "Camera Icon Slate",
+        "canonical": "#627990",
+        "tonalRamp": [
+          "oklch(15% 0.04479 248.62)",
+          "oklch(26.4% 0.04479 248.62)",
+          "oklch(37.9% 0.04479 248.62)",
+          "oklch(49.3% 0.04479 248.62)",
+          "oklch(60.7% 0.04479 248.62)",
+          "oklch(72.1% 0.04479 248.62)",
+          "oklch(83.6% 0.04479 248.62)",
+          "oklch(95% 0.04479 248.62)"
+        ]
+      },
+      "camera-off-dot": {
+        "role": "neutral",
+        "displayName": "Camera Off Dot",
+        "canonical": "#708295",
+        "tonalRamp": [
+          "oklch(15% 0.03591 249.84)",
+          "oklch(26.4% 0.03591 249.84)",
+          "oklch(37.9% 0.03591 249.84)",
+          "oklch(49.3% 0.03591 249.84)",
+          "oklch(60.7% 0.03591 249.84)",
+          "oklch(72.1% 0.03591 249.84)",
+          "oklch(83.6% 0.03591 249.84)",
+          "oklch(95% 0.03591 249.84)"
+        ]
+      },
+      "prototype-dot": {
+        "role": "neutral",
+        "displayName": "Prototype Dot",
+        "canonical": "#7c8999",
+        "tonalRamp": [
+          "oklch(15% 0.02855 253.66)",
+          "oklch(26.4% 0.02855 253.66)",
+          "oklch(37.9% 0.02855 253.66)",
+          "oklch(49.3% 0.02855 253.66)",
+          "oklch(60.7% 0.02855 253.66)",
+          "oklch(72.1% 0.02855 253.66)",
+          "oklch(83.6% 0.02855 253.66)",
+          "oklch(95% 0.02855 253.66)"
+        ]
+      },
+      "document-divider": {
+        "role": "neutral",
+        "displayName": "Document Divider",
+        "canonical": "#c8d3e0",
+        "tonalRamp": [
+          "oklch(15% 0.02165 252.52)",
+          "oklch(26.4% 0.02165 252.52)",
+          "oklch(37.9% 0.02165 252.52)",
+          "oklch(49.3% 0.02165 252.52)",
+          "oklch(60.7% 0.02165 252.52)",
+          "oklch(72.1% 0.02165 252.52)",
+          "oklch(83.6% 0.02165 252.52)",
+          "oklch(95% 0.02165 252.52)"
+        ]
+      },
+      "account-button-hover": {
+        "role": "secondary",
+        "displayName": "Account Action Mint Hover",
+        "canonical": "#4bdbb2",
+        "tonalRamp": [
+          "oklch(15% 0.13620 170.26)",
+          "oklch(26.4% 0.13620 170.26)",
+          "oklch(37.9% 0.13620 170.26)",
+          "oklch(49.3% 0.13620 170.26)",
+          "oklch(60.7% 0.13620 170.26)",
+          "oklch(72.1% 0.13620 170.26)",
+          "oklch(83.6% 0.13620 170.26)",
+          "oklch(95% 0.13620 170.26)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Authentication Headline",
+        "purpose": "Desktop authentication and banking task headings at 34px; phone and warning overrides are documented in DESIGN.md."
+      },
+      "camera-heading": {
+        "displayName": "Camera Heading",
+        "purpose": "Authentication camera title at 24px; desktop banking sidebar uses 20px, stacked view 22px and phones 21px."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Transactions section heading and warning question, with warning line-height override."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Inherited baseline."
+      },
+      "intro": {
+        "displayName": "Introduction",
+        "purpose": "Supporting screen introductions."
+      },
+      "label": {
+        "displayName": "Field Label",
+        "purpose": "Medium-weight field labels."
+      },
+      "support": {
+        "displayName": "Supporting Text",
+        "purpose": "Helper copy and secondary metadata."
+      },
+      "balance": {
+        "displayName": "Balance",
+        "purpose": "Account amount with tabular figures."
+      },
+      "size-21": {
+        "displayName": "Phone Camera Title",
+        "purpose": "Observed camera title on screens at 699px and below."
+      }
+    },
+    "shadows": [
+      {
+        "name": "toast",
+        "value": "0 8px 24px #152b4b29",
+        "purpose": "Transient toast only; resting panels and cards are flat. Teal keyboard outlines are focus indicators, not shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-state",
+        "value": "background .18s, color .18s, border-color .18s",
+        "purpose": "Observed button transitions."
+      },
+      {
+        "name": "field-state",
+        "value": "border-color .18s",
+        "purpose": "Observed field hover and focus transitions."
+      },
+      {
+        "name": "disclosure-chevron",
+        "value": "transform .2s",
+        "purpose": "Chevron rotates 180 degrees when the native disclosure opens."
+      },
+      {
+        "name": "disclosure-reveal",
+        "value": ".22s cubic-bezier(.22,1,.36,1)",
+        "purpose": "Measurement content reveals from opacity .65 and translateY(-4px). Reduced motion removes animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-max",
+        "value": "699px"
+      },
+      {
+        "name": "stacked-workspace-max",
+        "value": "1023px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1279px"
+      },
+      {
+        "name": "wide-desktop-min",
+        "value": "1600px"
+      },
+      {
+        "name": "brand-variants-stack-max",
+        "value": "899px"
+      },
+      {
+        "name": "small-header-max",
+        "value": "379px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "description": "Navy main action with white text, navy hover, and visible teal keyboard focus.",
+      "html": "<button class=\"ds-primary\">Zaloguj się</button>",
+      "css": ".ds-primary{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.4;min-height:52px;padding:14px 24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:var(--navy,#152b4b);color:var(--surface,#fff);border:1px solid var(--navy,#152b4b);font-weight:600;}.ds-primary:hover{background:var(--navy-hover,#234168);border-color:var(--navy-hover,#234168)}.ds-primary:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}.ds-primary:disabled{cursor:wait;opacity:.6}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "description": "Outlined alternative with a quiet hover surface and teal keyboard focus.",
+      "html": "<button class=\"ds-secondary\">Włącz kamerę</button>",
+      "css": ".ds-secondary{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.4;min-height:52px;padding:14px 24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:#fff;color:var(--navy,#152b4b);border:1px solid #b8c6d7;font-weight:500;}.ds-secondary:hover{background:#f3f7fc;border-color:#8297ae}.ds-secondary:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}.ds-secondary:disabled{cursor:wait;opacity:.6}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Text Action",
+      "kind": "button",
+      "description": "Lower-priority teal action with underlined hover and a 44px minimum hit area.",
+      "html": "<button class=\"ds-text\">Potrzebuję pomocy</button>",
+      "css": ".ds-text{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.6;font-weight:500;min-height:44px;padding:8px 0;color:var(--accent,#08786a);background:none;border:0;text-align:left;cursor:pointer;transition:background .18s,color .18s,border-color .18s;}.ds-text:hover{text-decoration:underline;text-underline-offset:4px}.ds-text:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-text{transition:none}}"
+    },
+    {
+      "name": "History Search Field",
+      "kind": "input",
+      "description": "Canonical labeled field with a muted inline search icon, 48px left inset, and hover/focus/invalid states; application filtering lives in app.js.",
+      "html": "<label class=\"ds-field ds-history-search\"><span>Szukaj w historii</span><div class=\"ds-search-control\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"10\" cy=\"10\" r=\"6\"/><path d=\"m15 15 6 6\"/></svg><input class=\"ds-input\" type=\"search\" placeholder=\"Odbiorca, tytuł lub data\" autocomplete=\"off\"></div></label>",
+      "css": ".ds-field{display:block;font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;color:var(--ink,#172d4d);margin-bottom:24px}.ds-field>span{display:block;font-size:16px;font-weight:500;margin-bottom:10px}.ds-input{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.6;width:100%;min-width:0;height:56px;background:#fff;border:1px solid #b8c6d7;border-radius:8px;padding:14px 16px;color:var(--navy,#152b4b);caret-color:var(--accent,#08786a);transition:border-color .18s}.ds-input::placeholder{color:#647285;opacity:1}.ds-input:hover{border-color:#8297ae}.ds-input:focus,.ds-input:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:3px;border-color:var(--accent,#08786a)}.ds-input[aria-invalid=true]{border-color:var(--error,#a22f36)}@media(prefers-reduced-motion:reduce){.ds-input{transition:none}} .ds-history-search{width:100%;max-width:420px;margin:0}.ds-search-control{position:relative}.ds-search-control svg{position:absolute;top:18px;left:16px;color:var(--muted,#5b6b7d);pointer-events:none}.ds-search-control input{padding-left:48px}",
+      "refersTo": "history-search"
+    },
+    {
+      "name": "Bank Navigation",
+      "kind": "nav",
+      "description": "Muted labels with a teal underline and text on the current banking section.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Nawigacja konta\"><button class=\"ds-nav-active\" aria-current=\"page\">Moje konto</button><button>Przelewy</button><button>Historia</button></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:32px;margin-bottom:28px;border-bottom:1px solid var(--line,#dae2eb);font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6}.ds-nav button{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;min-height:56px;font-size:15px;font-weight:500;color:var(--muted,#5b6b7d);border:0;border-bottom:2px solid transparent;background:none;padding:0 0 12px;cursor:pointer;transition:background .18s,color .18s,border-color .18s;}.ds-nav .ds-nav-active{color:var(--accent,#08786a);border-color:var(--accent,#08786a)}.ds-nav button:hover{color:var(--navy,#152b4b)}.ds-nav button:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}@media(max-width:1023px){.ds-nav{margin-bottom:28px}}@media(max-width:699px){.ds-nav{gap:28px}}@media(prefers-reduced-motion:reduce){.ds-nav button{transition:none}}",
+      "refersTo": "navigation-active"
+    },
+    {
+      "name": "Example Chip",
+      "kind": "chip",
+      "description": "Informational example-data label with 12px regular type.",
+      "html": "<span class=\"ds-chip\">Przykładowe</span>",
+      "css": ".ds-chip{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#dfe8f2;color:#445d77;font-size:12px;font-weight:400;line-height:1.6;border-radius:4px;padding:2px 6px}",
+      "refersTo": "chip"
+    },
+    {
+      "name": "Account Card",
+      "kind": "card",
+      "description": "Navy balance surface with tabular figures, light account metadata, and a borderless mint action; example values.",
+      "html": "<section class=\"ds-account\" aria-label=\"Przykładowe konto\"><div class=\"ds-account-name\">Konto osobiste</div><div class=\"ds-account-number\">28 0000 0000 0000 0000 0000 0482</div><div class=\"ds-balance-label\">Dostępne środki</div><div class=\"ds-balance\">18 420,50 <span>PLN</span></div><div class=\"ds-account-actions\"><button class=\"ds-account-button\">Nowy przelew</button></div></section>",
+      "css": ".ds-account{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;background:var(--navy,#152b4b);color:#fff;padding:32px;border-radius:var(--radius,14px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px}.ds-account-name{font-size:17px;font-weight:500}.ds-account-number{font-size:14px;color:#b6c7dd;margin-top:4px;overflow-wrap:anywhere}.ds-balance-label{font-size:14px;color:#b6c7dd;margin-top:24px}.ds-balance{font-size:40px;line-height:1.3;font-weight:500;letter-spacing:-.6px;font-variant-numeric:tabular-nums}.ds-balance span{font-size:20px;font-weight:400;margin-left:8px}.ds-account-actions{grid-column:2;grid-row:1/5;align-self:center}.ds-account-button{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.4;min-height:52px;padding:14px 24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:var(--mint,#67e8c5);color:var(--navy,#152b4b);border:0;font-weight:600}.ds-account-button:hover{background:var(--mint-hover,#4bdbb2)}.ds-account-button:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}@media(max-width:1279px){.ds-account-actions{grid-column:1;grid-row:auto;margin-top:16px}}@media(max-width:1023px){.ds-account-actions{grid-column:2;grid-row:1/5;margin:0}}@media(max-width:699px){.ds-account{grid-template-columns:1fr;padding:24px}.ds-account-actions{grid-row:auto;grid-column:1;margin-top:16px}.ds-balance{font-size:36px}.ds-account-number{font-size:13px}}@media(prefers-reduced-motion:reduce){.ds-account-button{transition:none}}",
+      "refersTo": "account-card"
+    },
+    {
+      "name": "Measurement Disclosure",
+      "kind": "custom",
+      "description": "Native disclosure for live experimental camera estimates; it remains optional and explains current, stale, and unavailable results.",
+      "html": "<details class=\"ds-parameters\"><summary><span class=\"ds-parameter-title\">Parametry sesji</span><svg class=\"ds-chevron\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-parameter-content\"><p>Wyniki analizy są eksperymentalne i mogą być niedostępne.</p><dl><div><dt>Estymowany puls</dt><dd>72 <span>BPM</span></dd></div><div><dt>Stan analizy</dt><dd>Analiza obrazu</dd></div></dl></div></details>",
+      "css": ".ds-parameters{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;background:var(--camera,#fff);color:var(--ink,#172d4d);border-top:1px solid #ccd7e4;border-bottom:1px solid #ccd7e4;padding-block:4px}.ds-parameters>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;font-size:15px;list-style:none;cursor:pointer}.ds-parameter-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-weight:500}.ds-parameters>summary::-webkit-details-marker{display:none}.ds-parameters>summary:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}.ds-parameter-chip{background:#dfe8f2;color:#445d77;font-size:12px;font-weight:400;border-radius:4px;padding:2px 6px}.ds-chevron{color:var(--muted,#5b6b7d);transition:transform .2s}.ds-parameters[open] .ds-chevron{transform:rotate(180deg)}.ds-parameter-content{padding-bottom:20px;animation:ds-reveal .22s var(--ease,cubic-bezier(.22,1,.36,1))}.ds-parameter-content p{font-size:13px;color:var(--muted,#5b6b7d);margin:0 0 16px}.ds-parameter-content dl{margin:0}.ds-parameter-content dl>div{display:flex;justify-content:space-between;gap:16px;padding:8px 0;font-size:14px}.ds-parameter-content dt{color:var(--muted,#5b6b7d)}.ds-parameter-content dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums;text-align:right}.ds-parameter-content dd span{font-size:12px;font-weight:400;color:var(--muted,#5b6b7d)}@keyframes ds-reveal{from{opacity:.65;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.ds-parameter-content{animation:none}.ds-chevron{transition:none}}"
+    },
+    {
+      "name": "Camera Panel",
+      "kind": "card",
+      "description": "Bordered white optional camera panel with a consented video-only WebRTC transmission to a local analysis server, active/off/error captions, and no audio or recordings.",
+      "html": "<aside class=\"ds-camera\" aria-label=\"Kamera\"><div class=\"ds-camera-heading\"><h2>Kamera</h2><span class=\"ds-camera-label\">Opcjonalna</span></div><p class=\"ds-camera-description\">Obraz pomaga zbierać dane do badania. Kamera nie potwierdza Twojej tożsamości.</p><div class=\"ds-preview\"><div class=\"ds-placeholder\"><strong>Podgląd wyłączony</strong><span>Uruchom, gdy będziesz gotowy</span></div><div class=\"ds-caption\"><span>Kamera wyłączona</span><span>Bez dźwięku</span></div></div></aside>",
+      "css": ".ds-camera{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;background:var(--camera,#fff);border:1px solid var(--line,#dae2eb);color:var(--ink,#172d4d);border-radius:16px;padding:32px;min-width:0}.ds-camera-heading{display:flex;align-items:center;gap:10px;margin-bottom:16px}.ds-camera h2{font-size:24px;line-height:1.3;letter-spacing:-.4px;margin:0;font-weight:500}.ds-camera-label{margin-left:auto;font-weight:400;color:var(--muted,#5b6b7d);font-size:12px;padding:4px 8px;background:var(--canvas,#f7f9fc);border-radius:4px}.ds-camera-description{color:var(--muted,#5b6b7d);font-size:15px;margin:0 0 24px;line-height:1.6;max-width:42ch}.ds-preview{position:relative;display:grid;grid-template-rows:minmax(0,1fr) auto;aspect-ratio:1.55;background:#eef3f5;border-radius:var(--radius,14px);overflow:hidden;isolation:isolate}.ds-placeholder{position:relative;grid-area:1/1;min-height:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#516274;font-size:14px;padding:16px;text-align:center}.ds-placeholder strong{font-weight:500;color:var(--navy,#152b4b);font-size:16px}.ds-caption{position:relative;grid-area:2/1;z-index:1;padding:12px 16px;font-size:12px;display:flex;justify-content:space-between;gap:8px;color:var(--muted,#5b6b7d);background:#e8eef1}@media(max-width:1279px){.ds-camera{padding:28px}}@media(max-width:1023px){.ds-camera{padding:24px}.ds-camera h2{font-size:22px}.ds-camera-description{margin-top:16px}.ds-preview{aspect-ratio:1.8}}@media(max-width:699px){.ds-camera h2{font-size:21px}.ds-camera-heading{margin-bottom:0}.ds-camera-label{display:none}.ds-preview{aspect-ratio:1.5}}",
+      "refersTo": "camera-panel"
+    },
+    {
+      "name": "Bank24 SVG Logo",
+      "kind": "custom",
+      "description": "Authored B mark with open loops and an outlined IBM Plex Sans Bank24 wordmark; widths are 190px, 148px and 126px with automatic height.",
+      "html": "<a class=\"ds-brand\" href=\"#login\" aria-label=\"Bank24, ekran logowania\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 252 64\" role=\"img\" aria-labelledby=\"title desc\"><title id=\"title\">Logo Bank24</title><desc id=\"desc\">Autorski znak B: dwa otwarte obiegi i wspólny pion. Logotyp Bank24 z literami w krzywych, na bazie IBM Plex Sans, SIL Open Font License.</desc><path fill=\"#152b4b\" d=\"M3 5H12V59H3Z\"/><path fill=\"#08786a\" d=\"M18 5H28C40 5 47 11 47 20C47 29 40 35 28 35H18V27H28C34 27 38 25 38 20C38 15 34 13 28 13H18Z\"/><path fill=\"#152b4b\" d=\"M18 35H30C36 35 40 38 40 43C40 48 36 51 30 51H18V59H30C42 59 49 53 49 43C49 34 43 28 34 27H18Z\"/><path fill=\"#152b4b\" transform=\"translate(67.000 49) scale(.052 -.052)\" d=\"M81.7197265625 0V698H405.380615234375Q491.380615234375 698 540.6755981445312 649.0Q589.9705810546875 600 589.9705810546875 518.7050170898438Q589.9705810546875 466 572.1755981445312 433.9424743652344Q554.380615234375 401.88494873046875 525.7655639648438 386.88494873046875Q497.1505126953125 371.88494873046875 464.98529052734375 369.29498291015625V363.29498291015625Q488.21539306640625 363 514.1829528808594 353.8525085449219Q540.1505126953125 344.70501708984375 563.4130554199219 325.70501708984375Q586.6755981445312 306.70501708984375 601.380615234375 275.6474914550781Q616.0856323242188 244.5899658203125 616.0856323242188 199.88494873046875Q616.0856323242188 144.29498291015625 592.5856323242188 99.0Q569.0856323242188 53.70501708984375 528.5856323242188 26.852508544921875Q488.08563232421875 0 436.08563232421875 0ZM213.660888671875 298.619384765625V112.0709228515625H398.100341796875Q422.820068359375 112.0709228515625 440.7123718261719 121.04583740234375Q458.60467529296875 130.020751953125 468.37457275390625 146.9705810546875Q478.14447021484375 163.92041015625 478.14447021484375 188.34515380859375V222.34515380859375Q478.14447021484375 246.7698974609375 468.37457275390625 263.7197265625Q458.60467529296875 280.6695556640625 440.7123718261719 289.64447021484375Q422.820068359375 298.619384765625 398.100341796875 298.619384765625ZM213.660888671875 585.9290771484375V407.2802734375H377.0501708984375Q400.88494873046875 407.2802734375 418.039794921875 415.960205078125Q435.19464111328125 424.64013671875 444.3170471191406 441.20501708984375Q453.439453125 457.7698974609375 453.439453125 481.01470947265625V512.1946411132812Q453.439453125 535.439453125 444.3170471191406 552.0043334960938Q435.19464111328125 568.5692138671875 418.039794921875 577.2491455078125Q400.88494873046875 585.9290771484375 377.0501708984375 585.9290771484375Z\"/><path fill=\"#152b4b\" transform=\"translate(100.876 49) scale(.052 -.052)\" d=\"M528.9705810546875 0H457.88494873046875Q429.4100341796875 0 406.9424743652344 13.5Q384.47491455078125 27 371.9498291015625 52.762542724609375Q359.42474365234375 78.52508544921875 359.42474365234375 113.75518798828125V124.98529052734375L391.1297607421875 89.64013671875H355.42474365234375Q342.24481201171875 39.820068359375 301.6872863769531 13.9100341796875Q261.1297607421875 -12 202.899658203125 -12Q123.01470947265625 -12 79.98226928710938 30.352508544921875Q36.9498291015625 72.70501708984375 36.9498291015625 141.88494873046875Q36.9498291015625 195.820068359375 63.417388916015625 231.08261108398438Q89.88494873046875 266.34515380859375 139.79498291015625 284.1976623535156Q189.70501708984375 302.0501708984375 260.47491455078125 302.0501708984375H349.07958984375V340.35986328125Q349.07958984375 383.37457275390625 326.1297607421875 407.7919616699219Q303.179931640625 432.2093505859375 251.75518798828125 432.2093505859375Q207.16522216796875 432.2093505859375 179.39532470703125 412.619384765625Q151.62542724609375 393.0294189453125 133.44549560546875 365.78460693359375L57.24481201171875 434.0501708984375Q86 479.2802734375 134.11505126953125 506.8127136230469Q182.2301025390625 534.3451538085938 260.6903076171875 534.3451538085938Q366.380615234375 534.3451538085938 421.70068359375 485.8775939941406Q477.020751953125 437.4100341796875 477.020751953125 347.65484619140625V101.72576904296875H528.9705810546875ZM349.07958984375 225.1297607421875H267.0501708984375Q216.67559814453125 225.1297607421875 191.72576904296875 208.65484619140625Q166.77593994140625 192.179931640625 166.77593994140625 160.52508544921875V143.75518798828125Q166.77593994140625 112.80535888671875 187.72576904296875 96.740478515625Q208.67559814453125 80.67559814453125 245.5103759765625 80.67559814453125Q274.93511962890625 80.67559814453125 298.0324401855469 89.29800415039062Q321.1297607421875 97.92041015625 335.10467529296875 114.83779907226562Q349.07958984375 131.75518798828125 349.07958984375 156.34515380859375Z\"/><path fill=\"#152b4b\" transform=\"translate(129.344 49) scale(.052 -.052)\" d=\"M201.660888671875 0H73.7197265625V522.3451538085938H201.660888671875V434.820068359375H207.0709228515625Q222.54583740234375 476.70501708984375 257.3983459472656 505.52508544921875Q292.2508544921875 534.3451538085938 353.0709228515625 534.3451538085938Q433.0709228515625 534.3451538085938 476.3983459472656 480.8177823294238Q519.7257690429688 427.2904108502538 519.7257690429688 329.5899658203125V0H391.78460693359375V317Q391.78460693359375 372.35107202324076 371.8023376464844 400.4277027596672Q351.820068359375 428.50433349609375 305.80535888671875 428.50433349609375Q279.57083197699654 428.50433349609375 255.79579196506077 419.41436767578125Q232.020751953125 410.32440185546875 216.8408203125 391.748770577567Q201.660888671875 373.1731392996652 201.660888671875 345.3096923828125Z\"/><path fill=\"#152b4b\" transform=\"translate(159.320 49) scale(.052 -.052)\" d=\"M73.7197265625 0V740H201.660888671875V399.660888671875V293.560546875H207.0709228515625L276.20068359375 387.90570068359375L393.29498291015625 522.3451538085938H537.5311279296875L357.8114013671875 320.460205078125L557.2361450195312 0H404.539794921875L270.90570068359375 234.09429931640625L201.660888671875 158.619384765625V0Z\"/><path fill=\"#08786a\" transform=\"translate(187.944 49) scale(.052 -.052)\" d=\"M545.6903076171875 110.660888671875V0H62.3096923828125V121.95587158203125L281.14447021484375 313.62542724609375Q337.19464111328125 362.1505126953125 363.14447021484375 402.2227478027344Q389.09429931640625 442.29498291015625 389.09429931640625 488.06488037109375V501.47491455078125Q389.09429931640625 546.7846069335938 359.2093505859375 571.5043334960938Q329.32440185546875 596.2240600585938 286.179931640625 596.2240600585938Q232.75518798828125 596.2240600585938 204.54281616210938 565.7491455078125Q176.3304443359375 535.2742309570312 164.44549560546875 492.32440185546875L49.96453857421875 536.1297607421875Q65.37457275390625 582.7698974609375 96.10467529296875 622.0324401855469Q126.83477783203125 661.2949829101562 176.7698974609375 685.6474914550781Q226.70501708984375 710 297.2301025390625 710Q370.8702392578125 710 422.39532470703125 682.9424743652344Q473.92041015625 655.8849487304688 501.03546142578125 609.3274230957031Q528.1505126953125 562.7698974609375 528.1505126953125 502.06488037109375Q528.1505126953125 443.83477783203125 504.42041015625 397.7772521972656Q480.6903076171875 351.7197265625 440.5501708984375 312.0722351074219Q400.4100341796875 272.42474365234375 351.88494873046875 232.42474365234375L204.77593994140625 110.660888671875Z\"/><path fill=\"#08786a\" transform=\"translate(218.544 49) scale(.052 -.052)\" d=\"M472.62542724609375 0H348.2093505859375V134.88494873046875H32.35986328125V246.95587158203125L310.259521484375 698H472.62542724609375V237.31573486328125H564.460205078125V134.88494873046875H472.62542724609375ZM339.68426513671875 569.5484619140625 140.26556396484375 237.31573486328125H348.2093505859375V569.5484619140625Z\"/></svg></a>",
+      "css": ".ds-brand{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;flex-shrink:0}.ds-brand svg{width:190px;height:auto;display:block}.ds-brand:focus-visible{outline:3px solid var(--accent,#08786a);outline-offset:4px;}@media(max-width:699px){.ds-brand svg{width:148px;height:auto}}@media(max-width:379px){.ds-brand svg{width:126px;height:auto}}",
+      "refersTo": "brand-logo"
+    }
+  ],
+  "narrative": {
+    "northStar": "Spokojna bankowość",
+    "overview": "The confirmed direction is a professional light fintech bank: white task surfaces on a cool canvas, navy text and primary actions, dark teal links and selection, and restrained mint accents on the account surface. The authored B mark combines two open loops with a shared vertical; the outlined IBM Plex Sans Bank24 wordmark keeps the identity consistent with interface labels and amounts. Aligned panels, a tighter workspace and useful account context make the banking task easy to scan.\n\nSafeTransfer appears within a bordered white camera panel and contextual account information. The optional camera sends video only after separate consent to a local analysis server; it records neither audio nor video. Estimates are experimental and do not establish identity or risk.",
+    "keyCharacteristics": [
+      "Cool canvas, white task surfaces, navy primary actions, and dark teal interaction states.",
+      "Authored SVG B mark with an outlined IBM Plex Sans Bank24 wordmark.",
+      "Locally hosted IBM Plex Sans, clear labels, and tabular financial figures.",
+      "Flat surfaces, subtle borders, and rounded controls.",
+      "Optional consented camera transmission to a local analysis server, with live experimental measurements.",
+      "Responsive task-first stacking and explicit demonstration labels."
+    ],
+    "rules": [
+      {
+        "name": "The Meaningful Color Rule",
+        "body": "Keep semantic green, amber, and red tied to their visible status or validation meaning, and retain the accompanying text label. Mint brand actions and teal interaction states do not indicate a risk score.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readable Example Rule",
+        "body": "Demonstration and privacy labels remain legible supporting text, with the example qualification beside the status or measurement it describes.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Depth Rule",
+        "body": "Preserve flat resting surfaces; reserve the recorded shadow for the toast and the recorded outline for field focus.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use white task surfaces on the cool canvas, navy primary actions, mint account accents, and teal interaction states for the confirmed professional light fintech identity.",
+      "Do use the authored Bank24 SVG logo and monogram with the documented clear space and responsive widths.",
+      "Do use the locally hosted IBM Plex Sans files and support Polish characters.",
+      "Do keep example qualifications beside prepared measurements, account data, and risk statements.",
+      "Do preserve the desktop camera/form split, the narrower authenticated sidebar, and task-first mobile stacking on this surface.",
+      "Do retain visible keyboard focus, textual errors, native disclosure semantics, and reduced-motion behavior.",
+      "Do keep camera consent, active/off/error states, and the ability to complete the flow without a camera."
+    ],
+    "donts": [
+      "Don't replace the confirmed light bank identity with a dark theme or a different font system.",
+      "Don't present experimental camera estimates or warning reasons as identity, medical, or risk determinations.",
+      "Don't make green, amber, or red the sole explanation of a state.",
+      "Don't add ambient shadows to the flat resting cards and panels.",
+      "Don't let supporting privacy or demonstration labels disappear when the sidebar narrows.",
+      "Don't claim camera transmission or analysis occurs without separate in-panel consent, or imply that audio/video recordings are retained."
+    ]
+  }
+}

@@ -8,6 +8,7 @@ Press q or Escape to exit. Estimates are experimental, not medical measurements.
 import argparse
 from collections import deque
 import importlib.util
+import json
 import math
 from pathlib import Path
 import queue
@@ -42,7 +43,12 @@ def estimate_bpm(predictions, fs, prior=None, track_width=15.0):
     With a prior (previous BPM), pick the peak within +/- track_width BPM of it,
     unless a much stronger peak exists elsewhere (lock lost, so re-acquire).
     """
-    pulse = np.cumsum(np.asarray(predictions, dtype=np.float64))
+    values = np.asarray(predictions, dtype=np.float64)
+    # Frequency-grid padding cannot replace sufficient observation time.
+    if (values.ndim != 1 or len(values) < 16 or not np.isfinite(values).all()
+            or not np.isfinite(fs) or fs <= 6.6 or (len(values) - 1) / fs < 5):
+        return None
+    pulse = np.cumsum(values)
     n = len(pulse)
     d = sparse.diags([np.ones(n - 2), -2 * np.ones(n - 2), np.ones(n - 2)],
                      [0, 1, 2], shape=(n - 2, n), format='csc')
@@ -54,12 +60,19 @@ def estimate_bpm(predictions, fs, prior=None, track_width=15.0):
     frequencies, power = signal.periodogram(filtered, fs=fs, window='hann',
                                             nfft=max(2048, 2 ** (n - 1).bit_length()))
     mask = (frequencies >= 0.75) & (frequencies <= 2.5)
-    best = np.argmax(power[mask])
-    if prior is not None:
-        near = mask & (np.abs(frequencies * 60 - prior) <= track_width)
-        if near.any() and power[near].max() * 3 >= power[mask][best]:
-            return float(frequencies[near][np.argmax(power[near])] * 60)
-    return float(frequencies[mask][best] * 60)
+    # Track local peaks, not bins on a stronger peak's slope.
+    peaks, _ = signal.find_peaks(power)
+    peaks = peaks[mask[peaks]]
+    if not len(peaks) or not np.isfinite(power).all() or power[peaks].max() <= 0:
+        return None
+    best = peaks[np.argmax(power[peaks])]
+    if prior is not None and np.isfinite(prior):
+        near = peaks[np.abs(frequencies[peaks] * 60 - prior) <= track_width]
+        if len(near):
+            tracked = near[np.argmax(power[near])]
+            if power[tracked] * 3 >= power[best]:
+                best = tracked
+    return float(frequencies[best] * 60)
 
 
 def load_model(toolbox, weights, device):
@@ -77,7 +90,8 @@ def load_model(toolbox, weights, device):
 
 def load_face_detector(toolbox):
     """Some OpenCV distributions omit the cascade; use the toolbox copy."""
-    candidates = [toolbox / 'dataset/haarcascade_frontalface_default.xml']
+    candidates = [toolbox / 'dataset/haarcascade_frontalface_default.xml',
+                  ROOT / 'models/haarcascade_frontalface_default.xml']
     data = getattr(cv2, 'data', None)
     if data is not None and hasattr(data, 'haarcascades'):
         candidates.append(Path(data.haarcascades) / 'haarcascade_frontalface_default.xml')
@@ -90,11 +104,8 @@ def load_face_detector(toolbox):
     raise RuntimeError(f'Could not load a face cascade. Checked: {searched}')
 
 
-class PostureExpression:
-    """Posture and facial-expression labels from MediaPipe landmarkers.
-
-    mediapipe is imported lazily so the rest of the script works without it.
-    """
+class LandmarkDetector:
+    """Detect raw MediaPipe pose and face landmarks without assigning labels."""
 
     def __init__(self, pose_path, face_path):
         import mediapipe as mp
@@ -106,89 +117,41 @@ class PostureExpression:
             running_mode=vision.RunningMode.VIDEO))
         self.face = vision.FaceLandmarker.create_from_options(vision.FaceLandmarkerOptions(
             base_options=mp_python.BaseOptions(model_asset_path=str(face_path)),
-            running_mode=vision.RunningMode.VIDEO, output_face_blendshapes=True))
-        self.baseline = None  # upright head-to-shoulder ratio, set with the 'c' key
-        self.ratio = None
-        self.posture, self.expression = 'no body', 'no face'
-        self.pose_pts = None   # {'ear': [l, r], 'shoulder': [l, r]} in pixels
-        self.face_pts = None   # {'mouth_corners': [...], 'lips': [...], 'brows': [...]} in pixels
+            running_mode=vision.RunningMode.VIDEO, output_face_blendshapes=False))
+        self.points = {'pose': [], 'face': []}
+        self.timestamp_ms = None
+
+    @staticmethod
+    def serialize(landmarks):
+        points = []
+        for index, landmark in enumerate(landmarks):
+            point = dict(index=index, x=float(landmark.x), y=float(landmark.y),
+                         z=float(landmark.z))
+            for field in ('visibility', 'presence'):
+                value = getattr(landmark, field, None)
+                if value is not None:
+                    point[field] = float(value)
+            points.append(point)
+        return points
 
     def analyze(self, frame_bgr, ts_ms):
-        h, w = frame_bgr.shape[:2]
         image = self.mp.Image(image_format=self.mp.ImageFormat.SRGB,
                               data=cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
-        # Posture: shoulder tilt, head tilt, and head-to-shoulder distance.
         pose = self.pose.detect_for_video(image, ts_ms)
-        if pose.pose_landmarks:
-            lm = pose.pose_landmarks[0]
-            pt = lambda i: np.array([lm[i].x * w, lm[i].y * h])
-            l_ear, r_ear, l_sh, r_sh = pt(7), pt(8), pt(11), pt(12)
-            tilt = lambda a, b: math.degrees(math.atan2(a[1] - b[1], a[0] - b[0]))
-            shoulder_tilt = abs(tilt(l_sh, r_sh))
-            shoulder_tilt = min(shoulder_tilt, 180 - shoulder_tilt)
-            head_tilt = abs(tilt(l_ear, r_ear))
-            head_tilt = min(head_tilt, 180 - head_tilt)
-            shoulder_width = np.linalg.norm(l_sh - r_sh) + 1e-6
-            # Bigger = head held higher above the shoulders; drops when slouching.
-            self.ratio = ((l_sh + r_sh) / 2 - (l_ear + r_ear) / 2)[1] / shoulder_width
-            issues = []
-            if shoulder_tilt > 8:
-                issues.append('shoulders uneven')
-            if head_tilt > 12:
-                issues.append('head tilted')
-            if self.baseline and self.ratio < 0.85 * self.baseline:
-                issues.append('slouching')
-            self.posture = ', '.join(issues) if issues else 'upright'
-            self.pose_pts = {'ear': [l_ear, r_ear], 'shoulder': [l_sh, r_sh]}
-        else:
-            self.ratio, self.posture, self.pose_pts = None, 'no body', None
-        # Expression: rule-based labels from blendshape scores.
         face = self.face.detect_for_video(image, ts_ms)
-        if face.face_blendshapes:
-            mesh = face.face_landmarks[0]
-            fp = lambda ids: [(int(mesh[i].x * w), int(mesh[i].y * h)) for i in ids]
-            # Face-mesh points behind each blendshape: smile -> mouth corners,
-            # jawOpen -> inner lips, browDown/browInnerUp -> brows.
-            self.face_pts = {'mouth_corners': fp((61, 291)), 'lips': fp((13, 14)),
-                             'brows': fp((107, 336, 105, 334))}
-            sc = {c.category_name: c.score for c in face.face_blendshapes[0]}
-            smile = (sc['mouthSmileLeft'] + sc['mouthSmileRight']) / 2
-            brow_down = (sc['browDownLeft'] + sc['browDownRight']) / 2
-            if smile > 0.5:
-                self.expression = 'smiling'
-            elif sc['jawOpen'] > 0.4 and sc['browInnerUp'] > 0.4:
-                self.expression = 'surprised'
-            elif brow_down > 0.5:
-                self.expression = 'frowning'
-            else:
-                self.expression = 'neutral'
-        else:
-            self.expression, self.face_pts = 'no face', None
+        self.points = {
+            'pose': self.serialize(pose.pose_landmarks[0]) if pose.pose_landmarks else [],
+            'face': self.serialize(face.face_landmarks[0]) if face.face_landmarks else [],
+        }
+        self.timestamp_ms = ts_ms
 
     def draw(self, frame):
-        """Dots on the landmarks each label is based on; active ones are larger."""
-        if self.pose_pts:
-            ok = self.posture == 'upright'
-            color = (0, 200, 0) if ok else (0, 0, 255)  # green = upright, red = problem
-            ear = [tuple(map(int, q)) for q in self.pose_pts['ear']]
-            sh = [tuple(map(int, q)) for q in self.pose_pts['shoulder']]
-            cv2.line(frame, sh[0], sh[1], color, 2)   # shoulder line (tilt)
-            cv2.line(frame, ear[0], ear[1], color, 2)  # ear line (head tilt)
-            for q in ear + sh:
-                cv2.circle(frame, q, 6, color, -1)
-            mid_sh = ((sh[0][0] + sh[1][0]) // 2, (sh[0][1] + sh[1][1]) // 2)
-            mid_ear = ((ear[0][0] + ear[1][0]) // 2, (ear[0][1] + ear[1][1]) // 2)
-            cv2.line(frame, mid_ear, mid_sh, color, 1)  # head-to-shoulder distance (slouch)
-        if self.face_pts:
-            active = {'smiling': 'mouth_corners', 'surprised': 'lips',
-                      'frowning': 'brows'}.get(self.expression)
-            for group, pts in self.face_pts.items():
-                hot = group == active
-                for q in pts:
-                    cv2.circle(frame, q, 5 if hot else 3,
-                               (0, 255, 255) if hot else (200, 200, 200), -1)
-                    if hot:
-                        cv2.circle(frame, q, 8, (0, 255, 255), 1)
+        h, w = frame.shape[:2]
+        for group, points in self.points.items():
+            for point in points:
+                center = (int(point['x'] * w), int(point['y'] * h))
+                radius = 3 if group == 'pose' else 1
+                cv2.circle(frame, center, radius + 1, (255, 255, 0), -1)
 
 
 def inference_worker(model, device, jobs, results, stop, window_seconds):
@@ -215,10 +178,6 @@ def inference_worker(model, device, jobs, results, stop, window_seconds):
             model.poolspa = torch.nn.AdaptiveAvgPool3d((n, 1, 1))
             with torch.inference_mode():
                 prediction = model(tensor.to(device))[0].cpu().numpy().ravel()
-            # A gap means the capture was reset, so old history is unrelated.
-            if last_time is not None and times[0] - last_time > 2.5 / fs:
-                history = []
-                prior = None
             # Windows overlap: the newest prediction replaces older ones
             # for the same instants, then the new window is appended.
             history = [h for h in history if h[0] < times[0]]
@@ -230,8 +189,7 @@ def inference_worker(model, device, jobs, results, stop, window_seconds):
             elapsed = t[-1] - t[0]
             uniform = np.linspace(t[0], t[-1], len(t))
             bpm = estimate_bpm(np.interp(uniform, t, p), (len(t) - 1) / elapsed, prior)
-            if bpm is not None:
-                prior = bpm
+            prior = bpm
             results.put((bpm, fs, elapsed, None))
     except Exception as exc:
         results.put((None, 0, 0, str(exc)))
@@ -247,12 +205,12 @@ def main():
     parser.add_argument('--fps', type=float, default=30, help='maximum model sampling rate; does not change camera settings')
     parser.add_argument('--preview-only', action='store_true', help='show camera video without model inference to diagnose capture issues')
     parser.add_argument('--window', type=float, default=10, help='max seconds of pulse history used for each estimate')
-    parser.add_argument('--stride', type=int, default=10, help='frames between updates (smaller = more frequent, more compute)')
-    parser.add_argument('--seed-bpm', type=float, default=72, help='placeholder BPM shown (marked with ~) until the first real reading; 0 disables')
+    parser.add_argument('--stride', type=int, default=1, help='legacy option; updates now run every 0.5 seconds')
+    parser.add_argument('--seed-bpm', type=float, default=0, help='placeholder BPM shown (marked with ~) until the first real reading; 0 disables')
     parser.add_argument('--min-frames', type=int, default=32, help='frames needed before the first estimate (multiple of 4; smaller = faster but rougher)')
     parser.add_argument('--pose-model', type=Path, default=ROOT / 'models/pose_landmarker_lite.task')
     parser.add_argument('--face-model', type=Path, default=ROOT / 'models/face_landmarker.task')
-    parser.add_argument('--no-analysis', action='store_true', help='disable posture and expression detection')
+    parser.add_argument('--no-analysis', action='store_true', help='disable landmark detection')
     parser.add_argument('--threads', type=int, default=4, help='PyTorch CPU threads')
     args = parser.parse_args()
     if args.fps <= 6.6 or args.window < 5 or args.threads < 1 or args.stride < 1:
@@ -286,18 +244,21 @@ def main():
     if not args.no_analysis:
         missing = [str(m) for m in (args.pose_model, args.face_model) if not m.is_file()]
         if missing:
-            print('Posture/expression disabled; model files not found: ' + ', '.join(missing))
+            print('Landmark detection disabled; model files not found: ' + ', '.join(missing))
         else:
             try:
-                analyzer = PostureExpression(args.pose_model, args.face_model)
+                analyzer = LandmarkDetector(args.pose_model, args.face_model)
             except ImportError:
-                print('Posture/expression disabled; install it with: pip install mediapipe')
+                print('Landmark detection disabled; install it with: pip install mediapipe')
     jobs, results, stop = queue.Queue(maxsize=1), queue.Queue(), threading.Event()
     worker = threading.Thread(target=inference_worker,
         args=(model, args.device, jobs, results, stop, args.window), daemon=True)
     if not args.preview_only:
         worker.start()
-    frames, timestamps = deque(maxlen=128), deque(maxlen=128)
+    # Keep enough observations for estimate_bpm's five-second minimum.
+    buffer_frames = max(128, math.ceil(args.window * args.fps))
+    buffer_frames += -buffer_frames % 4
+    frames, timestamps = deque(maxlen=buffer_frames), deque(maxlen=buffer_frames)
     since_job = 0
     box = target = None  # box is the smoothed face box; target is the latest detection
     count = 0
@@ -305,6 +266,7 @@ def main():
     bpm, shown_bpm, measured_fs, elapsed = None, None, 0, 0
     real_reading = False  # False while the displayed number is only the placeholder
     last_result = last_sample = 0
+    last_job = None
     print(f'Using {weights} on {args.device}. Keep still in steady lighting; press q to exit.')
     try:
         while not stop.is_set():
@@ -315,7 +277,7 @@ def main():
             # Own the display buffer instead of drawing on backend-owned memory.
             frame = frame.copy()
             frame = cv2.flip(frame, 1)
-            # Posture/expression every 3rd frame to leave CPU for PhysNet.
+            # Detect landmarks every third frame to leave CPU for PhysNet.
             if analyzer is not None and count % 3 == 0:
                 analyzer.analyze(frame, int(now * 1000))
             if count % 15 == 0:
@@ -335,17 +297,10 @@ def main():
                 frames.clear()
                 timestamps.clear()
                 since_job = 0
-                bpm = shown_bpm = None
-                real_reading = False
+                last_job = None
+                bpm = None
                 recent.clear()
             elif not args.preview_only and now - last_sample >= 0.9 / args.fps:
-                if timestamps and now - timestamps[-1] > 0.25:
-                    frames.clear()
-                    timestamps.clear()
-                    since_job = 0
-                    bpm = shown_bpm = None
-                    real_reading = False
-                    recent.clear()
                 x, y, w, h = map(int, box)
                 # Toolbox's enlarged face box (coefficient 1.5), clipped to image.
                 x1, y1 = max(0, x - w // 4), max(0, y - h // 4)
@@ -355,13 +310,14 @@ def main():
                 timestamps.append(now)
                 last_sample = now
                 since_job += 1
-                # Sliding window: after the first 128 frames, run again every
-                # `stride` new frames on the most recent 128.
-                if len(frames) >= args.min_frames and since_job >= args.stride:
+                # Update from the rolling frame buffer at most twice per second.
+                if (len(frames) >= args.min_frames
+                        and (last_job is None or now - last_job >= 0.5 - 1e-9)):
                     n = len(frames) // 4 * 4  # model needs a multiple of 4
                     try:
                         jobs.put_nowait((list(frames)[-n:], np.asarray(timestamps)[-n:]))
                         since_job = 0
+                        last_job = now
                     except queue.Full:
                         pass  # Worker is busy; retry on the next frame.
             while not results.empty():
@@ -369,6 +325,8 @@ def main():
                 if error:
                     raise RuntimeError(f'Inference failed: {error}')
                 last_result = now
+                if bpm is None:
+                    recent.clear()
                 if bpm is not None:
                     # Light smoothing so the live number doesn't jitter. The first
                     # real reading blends away from the placeholder instead of jumping.
@@ -377,10 +335,12 @@ def main():
                     weight = 0.3 if real_reading else 0.5
                     shown_bpm = median_bpm if shown_bpm is None else (1 - weight) * shown_bpm + weight * median_bpm
                     real_reading = True
-                    posture = analyzer.posture if analyzer is not None else 'disabled'
-                    expression = analyzer.expression if analyzer is not None else 'disabled'
-                    print(f'Posture: {posture} | Expression: {expression} | '
-                          f'Heart rate: {shown_bpm:.1f} BPM | capture: {measured_fs:.1f} FPS')
+                    print(json.dumps({
+                        'heart_rate_bpm': shown_bpm,
+                        'sampling_fps': measured_fs,
+                        'landmarks': analyzer.points if analyzer is not None else None,
+                        'landmarks_timestamp_ms': analyzer.timestamp_ms if analyzer is not None else None,
+                    }))
             # Until the first real reading, show a placeholder so the display never sits empty.
             if (not real_reading and box is not None and args.seed_bpm > 0
                     and not args.preview_only):
@@ -395,9 +355,6 @@ def main():
             key = cv2.waitKey(1) & 0xFF
             if key in (ord('q'), 27):
                 break
-            if key == ord('c') and analyzer is not None and analyzer.ratio is not None:
-                analyzer.baseline = analyzer.ratio
-                print('Upright posture calibrated')
         while not results.empty():
             error = results.get_nowait()[3]
             if error:

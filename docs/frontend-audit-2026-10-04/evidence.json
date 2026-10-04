@@ -1,0 +1,843 @@
+[
+  {
+    "name": "study",
+    "viewport": 1440,
+    "url": "http://localhost:5181/study",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Witaj w Bank24",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 340,
+        "width": 760,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "consent",
+    "viewport": 1440,
+    "url": "http://localhost:5181/study/consent",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Zasady udziału",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 340,
+        "width": 760,
+        "y": 155
+      },
+      "smallTargets": [
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "Wróć",
+          "tag": "A",
+          "width": 38,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "login",
+    "viewport": 1440,
+    "url": "http://localhost:5181/login",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1129,
+      "headings": [
+        {
+          "text": "Twoje finansesą u nas bezpieczne",
+          "tabindex": null
+        },
+        {
+          "text": "Zaloguj się do Bank24",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 608.328125,
+        "width": 468.65625,
+        "y": 137
+      },
+      "smallTargets": [
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "login-otp",
+    "viewport": 1440,
+    "url": "http://localhost:5181/verify-login",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1209,
+      "headings": [
+        {
+          "text": "Wpisz kod logowania",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 926,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "dashboard",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Dzień dobry, Anno",
+          "tabindex": null
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "history",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/history",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Historia operacji",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "history-filter-semantics",
+    "viewport": 1440,
+    "filters": [
+      {
+        "tag": "SPAN",
+        "text": "Wszystkie",
+        "role": null,
+        "tabIndex": -1
+      },
+      {
+        "tag": "SPAN",
+        "text": "Wpływy",
+        "role": null,
+        "tabIndex": -1
+      },
+      {
+        "tag": "SPAN",
+        "text": "Wydatki",
+        "role": null,
+        "tabIndex": -1
+      }
+    ]
+  },
+  {
+    "name": "transfer",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/transfers/new",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1244,
+      "headings": [
+        {
+          "text": "Nowy przelew",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 994,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "review",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/transfers/11d3588414164ddfa9ab185663ff2696/review",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Weryfikacja bezpieczeństwa",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "intervention",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/transfers/11d3588414164ddfa9ab185663ff2696/intervention",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1018,
+      "headings": [
+        {
+          "text": "Zachowaj kontrolę nad przelewem",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "confirm",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/transfers/11d3588414164ddfa9ab185663ff2696/confirm",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Potwierdź przelew",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "result",
+    "viewport": 1440,
+    "url": "http://localhost:5181/app/transfers/11d3588414164ddfa9ab185663ff2696/status",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1000,
+      "headings": [
+        {
+          "text": "Przelew zrealizowany",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 61,
+        "width": 1318,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "help",
+    "viewport": 1440,
+    "url": "http://localhost:5181/help?return=%2Fapp",
+    "layout": {
+      "viewportWidth": 1440,
+      "pageWidth": 1440,
+      "height": 1119,
+      "headings": [
+        {
+          "text": "Centrum pomocy",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 340,
+        "width": 760,
+        "y": 155
+      },
+      "smallTargets": [],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "study",
+    "viewport": 390,
+    "url": "http://localhost:5181/study",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 894,
+      "headings": [
+        {
+          "text": "Witaj w Bank24",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 130
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "consent",
+    "viewport": 390,
+    "url": "http://localhost:5181/study/consent",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1229,
+      "headings": [
+        {
+          "text": "Zasady udziału",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 130
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "Wróć",
+          "tag": "A",
+          "width": 38,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "login",
+    "viewport": 390,
+    "url": "http://localhost:5181/login",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1223,
+      "headings": [
+        {
+          "text": "Twoje finansesą u nas bezpieczne",
+          "tabindex": null
+        },
+        {
+          "text": "Zaloguj się do Bank24",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 112
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "login-otp",
+    "viewport": 390,
+    "url": "http://localhost:5181/verify-login",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1589,
+      "headings": [
+        {
+          "text": "Wpisz kod logowania",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 130
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "dashboard",
+    "viewport": 390,
+    "url": "http://localhost:5181/app",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1899,
+      "headings": [
+        {
+          "text": "Dzień dobry, Anno",
+          "tabindex": null
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "history",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/history",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1198,
+      "headings": [
+        {
+          "text": "Historia operacji",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "description": "Ensure elements that have scrollable content are accessible by keyboard in Safari",
+        "nodes": [
+          {
+            "target": [
+              ".history-filters"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "history-filter-semantics",
+    "viewport": 390,
+    "filters": [
+      {
+        "tag": "SPAN",
+        "text": "Wszystkie",
+        "role": null,
+        "tabIndex": -1
+      },
+      {
+        "tag": "SPAN",
+        "text": "Wpływy",
+        "role": null,
+        "tabIndex": -1
+      },
+      {
+        "tag": "SPAN",
+        "text": "Wydatki",
+        "role": null,
+        "tabIndex": -1
+      }
+    ]
+  },
+  {
+    "name": "transfer",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/transfers/new",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 3160,
+      "headings": [
+        {
+          "text": "Nowy przelew",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 16,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": true
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "review",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/transfers/e346aeda3ef14d92aa5efaef71e462c2/review",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1350,
+      "headings": [
+        {
+          "text": "Weryfikacja bezpieczeństwa",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "intervention",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/transfers/e346aeda3ef14d92aa5efaef71e462c2/intervention",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1501,
+      "headings": [
+        {
+          "text": "Zachowaj kontrolę nad przelewem",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "text": "",
+          "tag": "INPUT",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "confirm",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/transfers/e346aeda3ef14d92aa5efaef71e462c2/confirm",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1064,
+      "headings": [
+        {
+          "text": "Potwierdź przelew",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "result",
+    "viewport": 390,
+    "url": "http://localhost:5181/app/transfers/e346aeda3ef14d92aa5efaef71e462c2/status",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1232,
+      "headings": [
+        {
+          "text": "Przelew zrealizowany",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 149.390625
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  },
+  {
+    "name": "help",
+    "viewport": 390,
+    "url": "http://localhost:5181/help?return=%2Fapp",
+    "layout": {
+      "viewportWidth": 390,
+      "pageWidth": 390,
+      "height": 1260,
+      "headings": [
+        {
+          "text": "Centrum pomocy",
+          "tabindex": "-1"
+        }
+      ],
+      "main": {
+        "x": 25,
+        "width": 340,
+        "y": 130
+      },
+      "smallTargets": [
+        {
+          "text": "Pomoc",
+          "tag": "A",
+          "width": 20,
+          "height": 44
+        }
+      ],
+      "cameraVisible": false
+    },
+    "violations": [],
+    "errors": []
+  }
+]

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#152b4b">
+  <title>Bank24 · SafeTransfer · prototyp</title>
+  <link rel="icon" href="assets/bank24-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#screen">Przejdź do treści</a>
+  <div class="prototype-bar">
+    <span class="prototype-label"><span class="prototype-dot"></span> Prototyp <span class="prototype-detail">· dane przykładowe</span></span>
+    <details class="prototype-menu" id="prototype-menu"><summary>Ekrany prototypu</summary><div class="prototype-options"><nav id="prototype-nav" aria-label="Ekrany prototypu"></nav><fieldset class="scenario-choice"><legend>Scenariusz demonstracyjny</legend><label><input type="radio" name="scenario" value="standard" checked> Zwykły przelew</label><label><input type="radio" name="scenario" value="intervention"> Ostrzeżenie SafeTransfer</label></fieldset><a href="brand.html">Logo i identyfikacja Bank24</a></div></details>
+  </div>
+  <div class="header-shell"><header class="header">
+    <div class="header-identity"><a class="brand" id="brand-home" href="#login" aria-label="Bank24, ekran logowania"><img src="assets/bank24-logo.svg" alt="Bank24" width="190" height="48"></a><span class="banking-label">Bankowość internetowa</span></div>
+    <div class="header-right"><span class="safe-brand" id="safe-brand"></span><button class="text-button help-button" data-action="help">Pomoc</button><button id="logout" class="text-button" data-action="logout" hidden>Wyloguj</button></div>
+  </header></div>
+  <main id="layout" class="layout auth-layout">
+    <section id="screen" class="screen" tabindex="-1" aria-labelledby="screen-title"></section>
+    <aside id="camera-panel" class="camera-panel" aria-label="Kamera i parametry sesji">
+      <div class="camera-heading"><span class="camera-symbol" id="camera-symbol"></span><h2 id="camera-title">Twoja kamera</h2><span class="camera-label">Opcjonalna</span></div>
+      <details class="camera-body" id="camera-body" open><summary>Podgląd i ustawienia kamery</summary>
+      <p class="camera-description">Podgląd może towarzyszyć Ci podczas logowania i przelewu. Uruchomisz go po wyrażeniu zgody.</p>
+      <div class="camera-preview">
+        <video id="local-video" autoplay playsinline muted hidden aria-label="Lokalny podgląd Twojej kamery"></video>
+        <div id="camera-placeholder" class="camera-placeholder"><span id="placeholder-icon" class="placeholder-icon"></span><strong>Tu pojawi się Twój podgląd</strong><span>Kamera jest teraz wyłączona</span></div>
+        <div class="preview-caption"><span id="camera-status" class="camera-status">Kamera wyłączona</span><span id="preview-label">Podgląd lokalny</span></div>
+      </div>
+      <div class="camera-controls"><button class="secondary-button" id="camera-toggle" data-action="camera">Włącz kamerę</button><span>Bez nagrywania</span></div>
+      <div id="camera-consent" class="camera-consent" hidden><p>Podgląd pozostanie w tej przeglądarce. Prototyp nie przesyła, nie zapisuje ani nie analizuje obrazu.</p><label class="checkbox-row"><input id="camera-agreement" type="checkbox">Zgadzam się na lokalny podgląd kamery.</label><button class="primary-button small-button" data-action="camera-confirm">Uruchom podgląd</button><button class="text-button" data-action="camera-cancel">Anuluj</button></div>
+      <p id="camera-error" class="inline-error" role="status" hidden></p>
+      <details id="camera-parameters" class="parameters">
+        <summary><span class="parameter-title">Parametry sesji <span class="demo-chip">Przykładowe</span></span><span class="chevron" id="parameter-chevron"></span></summary>
+        <div class="parameter-content"><p class="parameter-note">Podgląd wyglądu panelu. Wartości poniżej są przykładowe, także po włączeniu kamery.</p><dl class="metric-list"><div><dt>Estymowany puls</dt><dd>72 <span>BPM</span></dd></div><div><dt>Twarz w kadrze</dt><dd>Wykryta</dd></div><div><dt>Postawa</dt><dd>Wyprostowana</dd></div><div><dt>Mimika</dt><dd>Neutralna</dd></div><div><dt>Stan analizy</dt><dd>Pomiar</dd></div></dl><details class="technical-details"><summary>Szczegóły pomiaru</summary><dl class="metric-list"><div><dt>Próbkowanie</dt><dd>29,8 FPS</dd></div><div><dt>Okno pomiaru</dt><dd>10 s</dd></div></dl></details></div>
+      </details>
+      <div class="privacy-note" id="privacy-note"></div>
+      <div class="camera-guidance"><h3>Przygotuj podgląd</h3><p>Ustaw kamerę na wysokości oczu i zadbaj o równomierne oświetlenie twarzy. Podgląd możesz wyłączyć w każdej chwili.</p></div>
+      </details>
+    </aside>
+  </main>
+  <section class="session-guidance" id="session-guidance" aria-labelledby="guidance-title"><div><h2 id="guidance-title">Zanim przejdziesz dalej</h2><p>Kilka zasad, które pomagają zachować kontrolę nad kontem.</p></div><ul><li><strong>Chroń dane logowania</strong><span>Nie przekazuj innym swojego hasła ani kodów autoryzacyjnych.</span></li><li><strong>Sprawdzaj dane przelewu</strong><span>Porównaj odbiorcę i kwotę przed wpisaniem kodu potwierdzenia.</span></li><li><strong>Zachowaj kontrolę</strong><span>W Bank24 wrócisz do edycji lub anulujesz przelew przed potwierdzeniem.</span></li></ul></section>
+  <footer class="footer"><div><strong>Bank24 · środowisko demonstracyjne</strong><p>Fikcyjne konto i przelewy. Prototyp nie wysyła pieniędzy.</p></div><nav aria-label="Informacje i pomoc"><button class="text-button" data-action="help">Centrum pomocy</button><a href="brand.html">Logo i identyfikacja</a></nav><span>SafeTransfer · HackYeah 2026</span></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
