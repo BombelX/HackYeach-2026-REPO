@@ -7,6 +7,7 @@ type EventMetadata = {
   stage: string;
   field: string;
   length?: number;
+  duration_ms?: number;
   x?: number;
   y?: number;
 };
@@ -35,18 +36,36 @@ export function configureTelemetry(session?: Session) {
       "title",
       "amount",
     ]);
-    const input = (event: Event) => {
-      const target = event.target;
+    const stageFor = (target: EventTarget | null) => {
       if (!(target instanceof HTMLInputElement) || !fields.has(target.id))
-        return;
-      const stage =
-        target.id === "username" || target.id === "password"
-          ? "login"
-          : "transfer";
-      if (event instanceof KeyboardEvent) {
-        if (event.key === "Backspace" || event.key === "Delete")
-          collect("correction", stage, target.id);
-      } else collect("focus", stage, target.id);
+        return null;
+      return target.id === "username" || target.id === "password"
+        ? "login" as const
+        : "transfer" as const;
+    };
+    const pressedKeys = new Map<string, { started: number; stage: "login" | "transfer"; field: string }>();
+    const keydown = (event: KeyboardEvent) => {
+      const target = event.target;
+      const stage = stageFor(target);
+      if (!stage || !(target instanceof HTMLInputElement)) return;
+      if (event.key === "Backspace" || event.key === "Delete")
+        collect("correction", stage, target.id);
+      collect("key_press", stage, target.id, event.repeat ? 1 : 0);
+      if (!event.repeat)
+        pressedKeys.set(event.code, { started: performance.now(), stage, field: target.id });
+    };
+    const keyup = (event: KeyboardEvent) => {
+      const press = pressedKeys.get(event.code);
+      if (!press) return;
+      pressedKeys.delete(event.code);
+      collect("key_dwell", press.stage, press.field, undefined,
+        Math.min(5000, Math.max(0, performance.now() - press.started)));
+    };
+    const focus = (event: FocusEvent) => {
+      const target = event.target;
+      const stage = stageFor(target);
+      if (stage && target instanceof HTMLInputElement)
+        collect("focus", stage, target.id);
     };
     let lastPointer = 0;
     const pointer = (event: PointerEvent) => {
@@ -67,17 +86,20 @@ export function configureTelemetry(session?: Session) {
         type: "pointer",
         stage,
         field: "none",
-        x: Math.max(0, Math.round(event.clientX)),
-        y: Math.max(0, Math.round(event.clientY)),
+        x: Math.max(0, Math.min(1, event.clientX / Math.max(1, window.innerWidth))),
+        y: Math.max(0, Math.min(1, event.clientY / Math.max(1, window.innerHeight))),
       });
     };
-    document.addEventListener("keydown", input);
-    document.addEventListener("focusin", input);
+    document.addEventListener("keydown", keydown);
+    document.addEventListener("keyup", keyup);
+    document.addEventListener("focusin", focus);
     document.addEventListener("pointermove", pointer);
     removeListeners = () => {
-      document.removeEventListener("keydown", input);
-      document.removeEventListener("focusin", input);
+      document.removeEventListener("keydown", keydown);
+      document.removeEventListener("keyup", keyup);
+      document.removeEventListener("focusin", focus);
       document.removeEventListener("pointermove", pointer);
+      pressedKeys.clear();
     };
   }
 }
@@ -86,6 +108,7 @@ export function collect(
   stage: "login" | "transfer",
   field: string,
   length?: number,
+  durationMs?: number,
 ) {
   if (!enabled) return;
   if (queue.length >= 100) queue.shift();
@@ -96,6 +119,7 @@ export function collect(
     stage,
     field,
     ...(length === undefined ? {} : { length }),
+    ...(durationMs === undefined ? {} : { duration_ms: durationMs }),
   });
 }
 export async function flushTelemetry() {

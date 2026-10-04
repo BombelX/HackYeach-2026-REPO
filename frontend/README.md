@@ -22,6 +22,12 @@ W pierwszym terminalu, w katalogu repozytorium:
 ./.venv-bank/Scripts/python.exe bank24_server.py --demo
 ```
 
+API operatora jest domyślnie wyłączone. Aby je włączyć, ustaw losowy token
+co najmniej 32 znaków w `BANK24_ADMIN_TOKEN` przed startem serwera; token
+przekazuj wyłącznie w nagłówku `Authorization: Bearer ...`. Nie commituj go.
+Kontrakt i kolejność wywołań są w [BANK24_API.md](../BANK24_API.md). Aplikacja
+React nie ma jeszcze ekranów operatora ani onboardingu badania.
+
 W drugim terminalu:
 
 ```powershell
@@ -55,8 +61,8 @@ autoryzowany snapshot co sekundę; stare pomiary po 5 s są ukrywane.
 
 Landing → login i hasło → kod logowania → konto → ręczny przelew →
 podsumowanie i sprawdzenie → kod transakcji → wynik. Historia, pomoc, ankieta
-i usuwanie opcjonalnych danych są działającymi ekranami. Nie ma strony ani
-bramki z kodem uczestnika.
+i usuwanie opcjonalnych danych są działającymi ekranami. Ekran kodu uczestnika
+nie jest jeszcze częścią UI; badanie można obecnie obsłużyć przez opisane API.
 
 - Sesja w cookie HttpOnly/SameSite Strict; token rotuje po pełnej weryfikacji.
 - CSRF i dozwolony origin są egzekwowane na serwerze. Localhost i 127.0.0.1
@@ -117,10 +123,21 @@ localhost wymaga STUN/TURN i HTTPS opisanych w głównym README.
 
 ## Zakres dalszych etapów planu
 
-To działająca demonstracja bankowości i integracji, nie zwalidowany detektor
-przejęcia konta ani presji. API celowo zwraca oddzielne wyniki ryzyka `null`.
-Sprawdzenie danych i deklaracja presji są rzeczywistymi regułami serwera,
-nie wynikami wytrenowanego modelu. Do kolejnego etapu pozostają: dostawca SMS,
-konfiguracja uczestników/scenariuszy operatora, kalibracja profili właściciela,
-walidacja modeli i progów, eksport badań/retencja oraz ręczny odbiór dostępności.
-Nie wpisano tych funkcji jako ukończonych w planie.
+Backend udostępnia API badania opisane w [BANK24_API.md](../BANK24_API.md):
+operator tworzy uczestników i przydziela scenariusze, uczestnik wiąże kod,
+wybiera osobne zgody i prowadzi sesję, a serwer wyciąga cechy z metadanych,
+buduje profile z co najmniej trzech spokojnych sesji właściciela na etap i
+zapisuje dwa wyjaśniane wskaźniki porównawcze. Telemetria nigdy nie zawiera
+treści wpisanych pól. Cofnięcie zgody usuwa powiązane dane i przelicza profile.
+
+Wskaźniki `robust-baseline-v1` są heurystyczne, niezwalidowane i nie są
+prawdopodobieństwem oszustwa. Bez powiązanej sesji badania, profilu lub
+wystarczającej telemetrii API zwraca `null`. Ekran przelewu pokazuje skalę
+0–100 wyłącznie z wyraźnym oznaczeniem eksperymentalnego charakteru. Te
+endpointy są już po stronie backendu; aplikacja nie ma jeszcze ekranów
+onboardingu badania ani panelu operatora.
+
+Nadal brakuje skonfigurowanego dostawcy SMS, walidacji progów na danych
+uczestników, eksportu Parquet, polityki retencji i odbioru dostępności z
+czytnikiem ekranu. To demonstracja reguł, a nie zwalidowany detektor przejęcia
+konta lub presji.

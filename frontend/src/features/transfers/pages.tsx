@@ -342,22 +342,22 @@ export function TransferFormPage() {
   );
 }
 
-const decisions = new Map<
-  string,
-  { independent: boolean | null; compared: boolean }
->();
+type TransferDecision = {
+  independent: boolean | null;
+  compared: boolean;
+  risk_acknowledged: boolean;
+};
+const decisions = new Map<string, { version: number; value: TransferDecision }>();
 export function ReviewPage() {
   const query = useTransfer();
   const task = useTask();
   const navigate = useNavigate();
   const id = useParams().id!;
-  const [decision, setDecision] = useState(
-    decisions.get(id) || { independent: null, compared: false },
-  );
-  function change(next: typeof decision) {
-    decisions.set(id, next);
-    setDecision(next);
-  }
+  const [localDecision, setLocalDecision] = useState<{
+    id: string;
+    version: number;
+    value: TransferDecision;
+  } | null>(null);
   if (!query.data)
     return (
       <>
@@ -366,6 +366,26 @@ export function ReviewPage() {
       </>
     );
   const transfer = query.data;
+  const defaultDecision: TransferDecision = {
+    independent: null,
+    compared: false,
+    risk_acknowledged: false,
+  };
+  const decision =
+    localDecision?.id === id && localDecision.version === transfer.version
+      ? localDecision.value
+      : decisions.get(id)?.version === transfer.version
+        ? decisions.get(id)!.value
+        : defaultDecision;
+  function change(next: TransferDecision) {
+    const saved = { version: transfer.version, value: next };
+    decisions.set(id, saved);
+    setLocalDecision({ id, ...saved });
+  }
+  const needsIndependentCheck = (transfer.risk.coercion_risk ?? 0) >= 70;
+  const hasBehavioralIndicators =
+    transfer.risk.account_takeover_risk !== null ||
+    transfer.risk.coercion_risk !== null;
   return (
     <>
       <Steps current={1} labels={["Dane przelewu", "Sprawdzenie", "Kod SMS"]} />
@@ -376,14 +396,46 @@ export function ReviewPage() {
       <Summary transfer={transfer} />
       <section className="risk-note" aria-labelledby="risk-heading">
         <p className="eyebrow">SAFETRANSFER</p>
-        <h2 id="risk-heading">Ocena ryzyka jest niedostępna</h2>
-        <p>
-          Nie mamy zwalidowanego modelu, który pozwalałby ocenić ryzyko dla tego
-          przelewu. Brak wyniku nie oznacza, że operacja jest bezpieczna lub
-          niebezpieczna.
-        </p>
+        <h2 id="risk-heading">
+          {hasBehavioralIndicators
+            ? "Eksperymentalne wskaźniki zachowania"
+            : "Ocena ryzyka jest niedostępna"}
+        </h2>
+        {hasBehavioralIndicators ? (
+          <>
+            <p>
+              To niewalidowane wskaźniki porównawcze w skali 0–100, a nie
+              prawdopodobieństwo oszustwa ani potwierdzenie tożsamości.
+            </p>
+            <dl className="risk-indicators">
+              <div>
+                <dt>Odchylenie od profilu przy logowaniu</dt>
+                <dd>
+                  {transfer.risk.account_takeover_risk === null
+                    ? "Brak wyniku"
+                    : `${transfer.risk.account_takeover_risk}/100`}
+                </dd>
+              </div>
+              <div>
+                <dt>Odchylenie przy przelewie</dt>
+                <dd>
+                  {transfer.risk.coercion_risk === null
+                    ? "Brak wyniku"
+                    : `${transfer.risk.coercion_risk}/100`}
+                </dd>
+              </div>
+            </dl>
+          </>
+        ) : (
+          <p>
+            Brakuje gotowego profilu lub wystarczających danych. Brak wyniku nie
+            oznacza, że operacja jest bezpieczna albo niebezpieczna.
+          </p>
+        )}
         <details>
-          <summary>Dlaczego nie ma wyniku?</summary>
+          <summary>
+            {hasBehavioralIndicators ? "Jak interpretować wynik?" : "Dlaczego nie ma wyniku?"}
+          </summary>
           <ul>
             {transfer.risk.reasons.map((reason) => (
               <li key={reason}>{reason}</li>
@@ -416,6 +468,30 @@ export function ReviewPage() {
           Ktoś wywiera na mnie presję lub mam wątpliwości
         </label>
       </fieldset>
+      {needsIndependentCheck && (
+        <section className="notice warning" aria-labelledby="risk-check-heading">
+          <h2 id="risk-check-heading">Sprawdź odbiorcę niezależnie</h2>
+          <p>
+            Eksperymentalny wskaźnik odchylenia jest podwyższony. Nie przesądza
+            o presji, ale przed kontynuacją potwierdź odbiorcę przez znany,
+            oficjalny kanał kontaktu — nie przez numer lub link z otrzymanej
+            wiadomości.
+          </p>
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={decision.risk_acknowledged}
+              onChange={(event) =>
+                change({
+                  ...decision,
+                  risk_acknowledged: event.target.checked,
+                })
+              }
+            />
+            Potwierdzam, że niezależnie sprawdziłem odbiorcę.
+          </label>
+        </section>
+      )}
       <label className="checkbox-row">
         <input
           type="checkbox"
@@ -434,7 +510,12 @@ export function ReviewPage() {
       <button
         className="primary-button"
         disabled={
-          task.busy || decision.independent === null || !decision.compared
+          task.busy ||
+          decision.independent === null ||
+          !decision.compared ||
+          (needsIndependentCheck &&
+            decision.independent !== false &&
+            !decision.risk_acknowledged)
         }
         onClick={() =>
           void task.run(async () => {
@@ -570,6 +651,21 @@ export function ConfirmPage() {
                   ]);
                   navigate(`/app/transfers/${id}/status`, { replace: true });
                 } catch (error) {
+                  if (
+                    error instanceof ApiError &&
+                    error.code === "risk_review"
+                  ) {
+                    await queryClient.invalidateQueries({
+                      queryKey: ["transfer", id],
+                    });
+                    queryClient.removeQueries({
+                      queryKey: ["transfer-challenge", id],
+                    });
+                    navigate(`/app/transfers/${id}/review`, {
+                      replace: true,
+                    });
+                    return;
+                  }
                   if (
                     error instanceof ApiError &&
                     (error.status === 0 || error.status >= 500)

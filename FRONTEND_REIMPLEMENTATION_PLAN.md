@@ -227,3 +227,52 @@ Wynik komend odbioru:
 - `.venv-bank\Scripts\python.exe -m unittest tests.test_webrtc_server` — 6 testów zaliczonych.
 
 Nowe zrzuty desktop/mobile są w `.impeccable/review/`. Lokalny obraz hero powstał na potrzeby tego interfejsu; jego opis i zasady użycia zapisano w `DESIGN.md`. OTP w środowisku demonstracyjnym nadal nie wysyła SMS — pokazuje kod testowy zgodnie z zakresem i dokumentacją.
+
+## 12. Audyt UI/UX z 4 października 2026 — follow-up
+
+### Zakres i werdykt
+
+Przegląd obejmuje frontend React: landing, logowanie, dashboard, przelew, sprawdzenie, wynik, pomoc i stan sesji. Podstawą były kod źródłowy oraz zrzuty 375 px i 1440 px w `.impeccable/review/react-*.png` (4 października 2026). Część kodu UI zmieniła się po wykonaniu tych zrzutów; bieżące ekrany formularza, sprawdzenia i wyniku otwarto dodatkowo na 375 px. W istniejącej operacji wskaźniki eksperymentalne były niedostępne, więc ich wariant liczbowy wymaga osobnego podglądu, gdy dane będą dostępne. Pozostałe pozycje bez aktualnego zrzutu oznaczono jako potwierdzone kodem, ale niezweryfikowane wizualnie. To audyt ekspercki, nie badanie z użytkownikami. Wytyczne interfejsu sprawdzono względem [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md).
+
+**Ocena heurystyczna: 27/40 — dobry punkt wyjścia, z dwiema istotnymi przerwami w ciągłości zadania.** Widoki bankowe są spokojne, mają czytelne etapy, jawnie rozróżniają brak wyniku od niewalidowanych wskaźników, a także pozwalają edytować i anulować przelew. Najwięcej tarcia występuje podczas ręcznego porównywania faktury na telefonie oraz po wygaśnięciu sesji. Nawigacja desktopowa powtarza te same miejsca w dwóch paskach.
+
+| Heurystyka | Ocena / 4 | Uzasadnienie |
+|---|---:|---|
+| Widoczność stanu | 3 | Aktywna sekcja, kroki, błędy, oczekiwanie i czas kodu są widoczne; brakuje jawnego komunikatu o wygaśnięciu sesji. |
+| Język użytkownika | 3 | Polskie nazwy bankowe są czytelne; skrót „NRB” wymaga objaśnienia prostym językiem przy polu. |
+| Kontrola i swoboda | 3 | Można wrócić, edytować i anulować; wygaśnięcie sesji gubi bieżący kontekst. |
+| Spójność | 2 | Te same sekcje występują w sidebarze i w nawigacji górnej pod różnymi nazwami. |
+| Zapobieganie błędom | 3 | Walidacja rachunku, kwoty i świadome porównanie danych pomagają uniknąć pomyłki. |
+| Rozpoznawanie zamiast pamiętania | 2 | Na telefonie faktura znajduje się po formularzu, więc dane trzeba zapamiętać albo przewijać tam i z powrotem. |
+| Elastyczność | 2 | Ścieżka jest liniowa; to akceptowalne dla demonstracji bankowej, ale spowalnia powtarzalne zadanie. |
+| Minimalizm | 3 | Interfejs jest spokojny; kamera i podwójna nawigacja konkurują z zadaniem na desktopie. |
+| Naprawa błędów | 3 | Błędy pól i wyniku mają ścieżki odzyskiwania; brak objaśnienia resetu przy sesji. |
+| Pomoc | 3 | FAQ i pomoc kontekstowa są dostępne, lecz bez wyszukiwania. |
+
+Obciążenie poznawcze jest umiarkowane: dwie z ośmiu sprawdzanych zasad wymagają poprawy — ograniczenie jednoczesnych celów na ekranie oraz unikanie konieczności pamiętania danych między widokami. Formularz i decyzja o presji pozostają dobrze podzielone na małe wybory.
+
+### Backlog poprawek
+
+| ID / priorytet | Problem i dowód | Rozwiązanie | Kryterium odbioru |
+|---|---|---|---|
+| **A1 / P1 — mobilne porównanie przelewu** | `.invoice { order: 2 }` w mobilnym układzie umieszcza dokument po formularzu (`frontend/src/design/styles.css`); w bieżącym widoku 375 px formularz zaczyna się na 287 px, a faktura na 893 px. CTA „Sprawdź przelew” styka się z „Wróć do konta” (`frontend/src/features/transfers/pages.tsx`), a legenda pytania nachodzi na ramkę ekranu sprawdzenia. | Na telefonie pokaż fakturę przed polami albo stale dostępny, zwijany panel referencyjny z pełnymi danymi. Zachowaj ręczne wpisywanie. Zgrupuj akcje, dodaj widoczny odstęp i układaj je pionowo, gdy brakuje miejsca. Zapewnij legendzie własną przestrzeń i naturalne zawijanie. | Przy 320–390 px odbiorca, rachunek i kwota pozostają dostępne podczas wpisywania; CTA są wyraźnie rozdzielone; legenda nie nachodzi na tekst ani ramkę. |
+| **A2 / P1 — wygaśnięcie sesji w trakcie zadania** | `frontend/src/layouts/RootLayout.tsx` czyści szkic i przechodzi do `/login` bez komunikatu ani adresu powrotu; `frontend/src/services/api.ts` wywołuje ten przepływ po 401. Niezapisane dane formularza przepadają, a aktywna operacja serwerowa nie wraca automatycznie do właściwego kroku. | Pokaż informację „Sesja wygasła” oraz dalszy krok. Po ponownym logowaniu wróć do bezpiecznej, wewnętrznej trasy konkretnej operacji i odzyskaj jej status z serwera. Jeśli szkic nie został zapisany, wyjaśnij to użytkownikowi; nie zapisuj haseł, kodów ani szkicu poza bieżącą sesją. | Po 401 podczas logowania lub przelewu widać przyczynę i możliwy następny krok. Zapisana operacja otwiera ten sam identyfikator i status; niezapisany szkic jest nazwany jako utracony. Ponowienie nie tworzy drugiego przelewu. |
+| **A3 / P2 — podwójna nawigacja desktopowa** | Pasek górny pokazuje Konto / Nowy przelew / Historia, a sidebar Przegląd / Przelewy / Historia operacji (`frontend/src/layouts/RouteLayouts.tsx`, ok. 94–106 i 151–162). | Zostaw jeden zestaw jako nawigację główną na desktopie; nazwy i stan aktywny ujednolić. W nagłówku zostawić logo, pomoc, status kamery i wylogowanie. Na telefonie zachować jeden kompaktowy pasek nawigacji. | Na szerokim ekranie każda sekcja ma jedno główne wejście; na telefonie dostępna pozostaje ta sama hierarchia i aktywny stan. |
+| **A4 / P2 — pusty miesiąc pokazuje proporcję 50/50** | Przy zerowej liczbie operacji `inflowShare` przyjmuje 50, a pasek i jego etykieta dostępności nadal pokazują równe udziały, chociaż tekst obok mówi o braku operacji (`frontend/src/features/accounts/pages.tsx`, ok. 70–81 i 153–160). | Ukryj pasek i etykietę udziałów, gdy suma wynosi zero. Pokaż wyłącznie pusty stan. | Pusty miesiąc nie pokazuje wartości, procentu ani wizualnej proporcji. |
+| **A5 / P2 — wynik przelewu eksponuje techniczne metadane** | Widoczny opis mówi o aktualizacji serwera, a identyfikator i wersja są w karcie wyniku. Bieżący zrzut 375 px potwierdza, że długi identyfikator konkuruje z pierwszym komunikatem o realizacji (`frontend/src/features/transfers/pages.tsx`, komponent `StatusPage`). | Na pierwszym planie pokaż status, kwotę, odbiorcę i informację, że to demonstracja. Identyfikator, wersję i datę przenieś do rozwijanych szczegółów. | Użytkownik od razu rozpoznaje, czy operacja jest zrealizowana, wstrzymana czy anulowana oraz kogo i jaką kwotę dotyczy; diagnostyka jest dostępna na żądanie. |
+| **A6 / P2 — landing ma umiarkowany efekt generycznego fintechu** | Slogan „Twoje finanse. Twój spokój”, krajobraz z unoszącą się kartą rachunku i numerowane kafle cech to popularny układ kategorii (`frontend/src/features/landing/LandingPage.tsx`, ok. 42–94). To ocena wrażenia, nie dowód użycia AI; własny znak, lokalny obraz i szczere oznaczenie demonstracji są atutami. | Oprzyj hero o konkretną czynność SafeTransfer: porównanie danych z fakturą, możliwość edycji albo zatrzymania i świadome potwierdzenie. Ogranicz powtarzane slogany, numerowanie dekoracyjne i drobne etykiety sekcji. Zachowaj znak, jasną paletę i prawdziwe funkcje. | Pierwszy ekran wyjaśnia, co demonstracja robi, bez ogólnych obietnic. Każda widoczna cecha odsyła do działającej funkcji; dekoracja nie udaje danych ani pomiaru. |
+| **A7 / P3 — mała typografia nawigacji mobilnej** | Etykiety nawigacji i kroków mają 10 px, a wylogowanie 11 px w mobilnych regułach `frontend/src/design/styles.css`, poniżej zakresu 12–14 px zapisanego w `DESIGN.md`. | Podnieś tekst do co najmniej 12 px albo skróć etykiety; zachowaj cele dotykowe co najmniej 44 px. | Tekst jest czytelny przy 375 px, etykiety nie wypychają kontrolek i nie zmniejszają celów dotykowych. |
+| **A8 / P3 — skrócone nazwy operacji bez podglądu całości** | Dashboard ucina długie nazwy odbiorców i tytuły; lista nie daje osobnego wejścia w szczegóły (`frontend/src/features/accounts/pages.tsx`, komponent `Ledger`). | Udostępnij pełną nazwę po otwarciu operacji lub pokaż do dwóch wierszy z czytelnym rozwinięciem; kwota i data pozostają widoczne. | Dwie operacje tego samego odbiorcy można odróżnić na desktopie i telefonie bez polegania wyłącznie na uciętym tekście. |
+
+### Odbiór planu
+
+1. Najpierw wdrożyć A1 i A2, bo wpływają na wykonanie oraz odzyskanie ważnego zadania. Następnie A3–A6 jako spójny przegląd nawigacji, danych i hierarchii produktu. A7–A8 można połączyć z tą samą iteracją wizualną.
+2. Po poprawkach sprawdzić landing, logowanie, dashboard, formularz, sprawdzenie i wynik w 320, 375, 768 i 1440 px. Przejść cały flow klawiaturą, zweryfikować powrót po wygaśnięciu i pusty miesiąc. Zachować prawdziwe stany, nie makiety zastępujące zachowanie.
+3. Ocena „AI-slop” dotyczy charakteru kompozycji i tekstu, nie pochodzenia obrazu ani kodu. W obecnym UI jest umiarkowana i skupia się na publicznym landingu; widoki zadaniowe są bardziej produktowe i wiarygodne.
+4. Starsze pozycje z `docs/frontend-audit-2026-10-04/AUDIT.md` pozostają materiałem historycznym. Mobilne obcinanie pulpitu, myląca akcja wylogowania, nieaktywne filtry, brak wyszukiwania całej historii, obraz udający podgląd kamery i niedziałające kopiowanie rachunku są w bieżącym kodzie naprawione. Problem wyniku rozwiązano częściowo: tytuł statusu jest jasny, lecz techniczne metadane nadal konkurują z podsumowaniem.
+
+Kontrola mechaniczna `impeccable detect --json frontend/src/main.tsx` nie zwróciła znalezisk (`[]`). Zakres tej komendy jest węższy niż cały interfejs; obserwacje powyżej pochodzą również z kodu widoków i aktualnych zrzutów. W ramach tego audytu nie uruchamiano testów ani nie zmieniano kodu UI.
+
+Uwaga do bieżącej pracy w repozytorium: lokalne zmiany w API, telemetrii i karcie wskaźników pozostały nienaruszone. Otwarty przykład przelewu pokazywał stan bez dostępnej oceny. Przed scaleniem nowego wariantu liczbowego należy obejrzeć jego układ i sprawdzić, czy opis jasno wyjaśnia znaczenie skali.
+
+Bieżące zrzuty 375 px formularza, sprawdzenia i wyniku wykonano wyłącznie do oglądu; dokument szerokością mieścił się w viewportcie. Pokazały one kolejność faktura → formularz do odwrócenia, nachodzącą legendę oraz metadane wyniku do schowania w szczegółach.

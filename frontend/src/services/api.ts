@@ -127,9 +127,15 @@ export interface Challenge {
 export interface Risk {
   account_takeover_risk: number | null;
   coercion_risk: number | null;
+  assessment_status?: "ready" | "limited" | "insufficient_data" | "unavailable";
   quality: string;
   action: string;
   reasons: string[];
+  missing_reasons?: string[];
+  available_signals?: string[];
+  recommended_interventions?: string[];
+  validated?: boolean;
+  model_version?: string;
   assessed_at: number;
 }
 export interface Transfer {

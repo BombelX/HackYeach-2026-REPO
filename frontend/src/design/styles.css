@@ -1676,6 +1676,25 @@ legend {
   color: var(--muted);
   font-size: 14px;
 }
+.risk-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin: 12px 0 17px;
+}
+.risk-indicators div {
+  min-width: min(100%, 210px);
+}
+.risk-indicators dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.risk-indicators dd {
+  margin: 2px 0 0;
+  color: var(--navy);
+  font-size: 18px;
+  font-weight: 700;
+}
 .risk-note details summary,
 .notice details summary {
   color: var(--teal-dark);
