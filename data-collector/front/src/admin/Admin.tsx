@@ -54,9 +54,9 @@ export function Admin() {
     return (
       <div className="study-shell">
         <div className="study-card">
-          <h1>Panel prowadzącego</h1>
+          <h1>Facilitator panel</h1>
           <div className="field">
-            <label>Hasło</label>
+            <label>Password</label>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} data-field="admin_pw" />
           </div>
           {error && <p className="error">{error}</p>}
@@ -72,7 +72,7 @@ export function Admin() {
               }
             }}
           >
-            Wejdź
+            Sign in
           </button>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function Admin() {
   return (
     <div className="admin">
       <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Bank24 — prowadzący</h1>
+        <h1>Bank24 — facilitator</h1>
         <button
           className="btn secondary"
           onClick={() => {
@@ -90,7 +90,7 @@ export function Admin() {
             setToken("");
           }}
         >
-          Wyloguj
+          Sign out
         </button>
       </div>
       <div className="row" style={{ marginBottom: 16 }}>
@@ -106,28 +106,28 @@ export function Admin() {
             await refresh();
           }}
         >
-          Nowy uczestnik
+          New participant
         </button>
         <button className="btn secondary" onClick={() => void refresh()}>
-          Odśwież
+          Refresh
         </button>
       </div>
       {created && (
         <div className="card" style={{ marginBottom: 16 }}>
-          <strong>Kod: {(created as { code: string }).code}</strong>
+          <strong>Code: {(created as { code: string }).code}</strong>
           <pre className="invoice">{JSON.stringify((created as { identity: unknown }).identity, null, 2)}</pre>
         </div>
       )}
-      <h3>Na żywo</h3>
+      <h3>Live</h3>
       <table className="table">
         <thead>
           <tr>
-            <th>Kod</th>
-            <th>Sesja</th>
-            <th>Warunek</th>
-            <th>Zdarzenia</th>
-            <th>Twarz</th>
-            <th>Wideo</th>
+            <th>Code</th>
+            <th>Session</th>
+            <th>Condition</th>
+            <th>Events</th>
+            <th>Face</th>
+            <th>Video</th>
             <th></th>
           </tr>
         </thead>
@@ -153,7 +153,7 @@ export function Admin() {
                     })
                   }
                 >
-                  Restart czatu
+                  Restart chat
                 </button>
               </td>
             </tr>
@@ -161,22 +161,22 @@ export function Admin() {
           {!live.length && (
             <tr>
               <td colSpan={7} className="muted">
-                Brak otwartych sesji
+                No open sessions
               </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      <h3>Włamywacze</h3>
+      <h3>Intruders</h3>
       <table className="table">
         <thead>
           <tr>
             <th>#</th>
-            <th>Kod</th>
-            <th>Kwota</th>
-            <th>Czas</th>
-            <th>Sukces</th>
+            <th>Code</th>
+            <th>Amount</th>
+            <th>Time</th>
+            <th>Success</th>
           </tr>
         </thead>
         <tbody>
@@ -186,20 +186,20 @@ export function Admin() {
               <td>{b.code}</td>
               <td>{b.amount}</td>
               <td>{b.seconds ? Number(b.seconds).toFixed(1) + " s" : "—"}</td>
-              <td>{b.success ? "tak" : "nie"}</td>
+              <td>{b.success ? "yes" : "no"}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <h3>Uczestnicy</h3>
+      <h3>Participants</h3>
       <table className="table">
         <thead>
           <tr>
-            <th>Kod</th>
-            <th>Imię</th>
-            <th>Ofiara</th>
-            <th>Sesje</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Victim</th>
+            <th>Sessions</th>
             <th></th>
           </tr>
         </thead>
@@ -228,12 +228,12 @@ export function Admin() {
                 <button
                   className="btn danger"
                   onClick={async () => {
-                    if (!confirm(`Usunąć dane ${p.code}?`)) return;
+                    if (!confirm(`Delete data for ${p.code}?`)) return;
                     await fetch(url(`/api/admin/participants/${p.code}`), { method: "DELETE", headers: auth! });
                     await refresh();
                   }}
                 >
-                  Usuń
+                  Delete
                 </button>
               </td>
             </tr>
@@ -253,7 +253,7 @@ export function Admin() {
                   href={url(`/api/admin/sessions/${playing}/video?key=${encodeURIComponent(token)}`)}
                   download={`${playing}.webm`}
                 >
-                  Pobierz
+                  Download
                 </a>
                 <button className="btn secondary" onClick={() => setPlaying(null)}>
                   Zamknij

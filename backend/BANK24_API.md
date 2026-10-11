@@ -1,173 +1,170 @@
-# Bank24 API v1 — wdrożony kontrakt lokalny
+# Bank24 API v1 — implemented local contract
 
-Serwer `bank24_server.py` działa domyślnie na loopback 8081; worker WebRTC
-`webrtc_server.py` na loopback 8080. W trybie deweloperskim Vite proxy
-zachowuje origin przeglądarki.
+`bank24_server.py` defaults to loopback port 8081; `webrtc_server.py` provides the
+camera worker on port 8080. Vite's development proxy preserves the browser origin.
 
-## Sesja i logowanie
+## Session and sign-in
 
-`POST /api/bootstrap` tworzy lub zwraca sesję w cookie HttpOnly,
-SameSite Strict. Odpowiedź zawiera `csrf`, `session_id`, `telemetry`, `camera`,
-`authenticated`, `demo_mode`, `camera_transmission`, `study_participant` i
-`study_session_id`. TTL sesji to 2 godziny. Mutacje uczestnika wymagają cookie,
-nagłówka `X-CSRF-Token` i dozwolonego Origin. Po poprawnym kodzie logowania
-serwer rotuje cookie i CSRF.
+`POST /api/bootstrap` creates or returns a session through an HttpOnly,
+SameSite Strict cookie. The response contains `csrf`, `session_id`, `telemetry`,
+`camera`, `authenticated`, `demo_mode`, `camera_transmission`, `study_participant`
+and `study_session_id`. Session TTL is two hours. Participant mutations require
+the cookie, `X-CSRF-Token` and an allowed Origin. Successful code verification
+rotates the session cookie and CSRF token.
 
-| Metoda i ścieżka | Dane / rezultat |
+| Method and path | Input / result |
 | --- | --- |
-| POST `/api/session/permissions` | Częściowa zmiana `{telemetry?:boolean,camera?:boolean}` i bieżący stan sesji |
-| POST `/api/session/withdraw` | Wymaga logowania; przy sesji badania usuwa dane uczestnika, w pozostałych przypadkach dane bieżącej sesji; fikcyjny rachunek zostaje |
-| POST `/api/bank/login` | `{username,password,remember}` → challenge; konto wybierane po prawidłowym loginie i haśle |
-| GET / POST `/api/bank/login-challenge` | Odczyt / ponowne zamówienie kodu logowania |
-| POST `/api/bank/verify` | `{challenge_id,code}` → `{ok,csrf}`, pełna autoryzacja i rotacja tokenu |
-| POST `/api/bank/logout` | Kończy sesję i kamery |
-| DELETE `/api/bank/device` | Cofa zapamiętanie bieżącego urządzenia |
-| GET `/api/bank/account` | Wymaga pełnego logowania; saldo w groszach, NRB, sumy miesiąca, stan urządzenia, fikcyjna faktura |
-| GET `/api/bank/transactions?offset=0&limit=30&q=&direction=all` | Wymaga logowania; przeszukana i przefiltrowana lista oraz dokładny `total` przed paginacją |
-| POST `/api/study/survey` | Wymaga logowania; `{rating:1..5,comment:string<=500}` |
+| POST `/api/session/permissions` | Partial update `{telemetry?:boolean,camera?:boolean}`; returns current session state |
+| POST `/api/session/withdraw` | Requires sign-in; deletes participant data for a study session, otherwise current-session optional data; retains the fictional account |
+| POST `/api/bank/login` | `{username,password,remember}` → challenge; valid credentials select the account |
+| GET / POST `/api/bank/login-challenge` | Read / request another sign-in code |
+| POST `/api/bank/verify` | `{challenge_id,code}` → `{ok,csrf}`; full authentication and token rotation |
+| POST `/api/bank/logout` | Ends the session and camera resources |
+| DELETE `/api/bank/device` | Revokes trust for the current device |
+| GET `/api/bank/account` | Requires full sign-in; balance in grosz, NRB, monthly totals, device state and fictional invoice |
+| GET `/api/bank/transactions?offset=0&limit=30&q=&direction=all` | Requires sign-in; searched/filtered list with exact `total` before pagination |
+| POST `/api/study/survey` | Requires sign-in; `{rating:1..5,comment:string<=500}` |
 
-Udział w badaniu jest opcjonalny dla zwykłego demo Bank24. Gdy jest aktywny,
-kod uczestnika i zgody wiążą sesję z badaniem przed logowaniem. Telemetria i
-kamera mają oddzielne zgody. `direction` to `all`, `incoming` lub `outgoing`.
-Wyszukiwanie historii ignoruje wielkość liter i polskie znaki diakrytyczne;
-filtr działa po stronie API przed offsetem i limitem. Sortowanie jest
-deterministyczne.
+Study participation is optional in the regular Bank24 demo. When used, participant
+codes and consent link the session to the study before sign-in. Camera and
+telemetry consent are separate. `direction` accepts `all`, `incoming`, `outgoing`.
+History search is case-insensitive and accent-insensitive. Filtering occurs before
+offset/limit, with deterministic ordering.
 
-Błąd JSON: `{code,message,fields}`. 401 kończy dostęp do banku, 403 dotyczy
-CSRF/origin lub wyłączonego uprawnienia, 409 stanu/wariantu, 422 walidacji,
-429 limitu/cooldown, a 503 niedostępnej usługi. Nie ma cichego mocka.
+JSON errors use `{code,message,fields}`. Status 401 ends access, 403 indicates
+CSRF/origin or permission failures, 409 state/version conflicts, 422 validation,
+429 rate limits/cooldowns, and 503 unavailable services. There is no silent mock.
 
-Challenge zawiera `challenge_id`, `expires_at`, `resend_at`, `demo_mode` i
-`code_length`; czasy są w sekundach Unix. Ważność wynosi 300 sekund, cooldown
-30 sekund, limit to 5 prób. `--demo` jawnie włącza OTP `1234` i długość 4.
-Poza demo wymagany jest adapter `otp_provider` przekazany do `create_app`;
-bez niego serwer zwraca 503, zamiast udawać wysłanie SMS.
+Challenges contain `challenge_id`, `expires_at`, `resend_at`, `demo_mode` and
+`code_length`. Times use Unix seconds. Codes last 300 seconds, with a 30-second
+resend cooldown and five attempts. `--demo` explicitly uses four-digit OTP `1234`.
+Outside demo mode an `otp_provider` adapter must be passed to `create_app`;
+without it the server returns 503 instead of pretending to send SMS.
 
-## Przelew
+## Transfers
 
-| Metoda i ścieżka | Dane / rezultat |
+| Method and path | Input / result |
 | --- | --- |
-| POST `/api/bank/transfers` | `{recipient,number,title,amount_grosz}` → zapisany podgląd, 201 |
-| PUT `/api/bank/transfers/{id}` | Te same pola + `{version}` → nowa wersja, unieważnienie wcześniejszych kodów i decyzji |
-| GET `/api/bank/transfers/{id}` | Trwały stan przypisany do zalogowanego konta |
-| POST `/api/bank/transfers/{id}/intervention` | `{version,independent:boolean,compared:true,risk_acknowledged?:boolean}` → `ready` albo nieodwracalne `held`; przy wskaźniku presji ≥70 kontynuowanie wymaga niezależnego sprawdzenia odbiorcy |
-| GET / POST `/api/bank/transfers/{id}/challenge` | Odczyt / zamówienie kodu dla identyfikatora i wersji |
-| POST `/api/bank/transfers/{id}/submit` | `{version,challenge_id,code}` + `Idempotency-Key` → zapisany wynik |
-| POST `/api/bank/transfers/{id}/cancel` | Anulowanie niezrealizowanego przelewu |
+| POST `/api/bank/transfers` | `{recipient,number,title,amount_grosz}` → saved preview, 201 |
+| PUT `/api/bank/transfers/{id}` | Same fields plus `{version}` → new version; invalidates previous codes and decisions |
+| GET `/api/bank/transfers/{id}` | Persistent state owned by the signed-in account |
+| POST `/api/bank/transfers/{id}/intervention` | `{version,independent:boolean,compared:true,risk_acknowledged?:boolean}` → `ready` or irreversible `held`; pressure ≥70 requires independent recipient verification |
+| GET / POST `/api/bank/transfers/{id}/challenge` | Read / request a code bound to transfer ID and version |
+| POST `/api/bank/transfers/{id}/submit` | `{version,challenge_id,code}` plus `Idempotency-Key` → saved result |
+| POST `/api/bank/transfers/{id}/cancel` | Cancels an unfinished transfer |
 
-Frontend łączy podsumowanie, sprawdzenie danych i pytanie o samodzielność w
-jednym ekranie. API nadal egzekwuje przejście stanu, więc klient nie może
-pominąć porównania danych ani cofnąć blokady. Status: `review → ready →
-completed`, alternatywnie `held` lub `cancelled`. Kwota musi być dodatnią
-liczbą całkowitą groszy; rachunek NRB przechodzi kontrolę sumy. Submit sprawdza
-saldo i aktualizuje rachunek oraz historię atomowo. Ponowienie completed nie
-powoduje drugiego obciążenia.
+The frontend combines summary, comparison and decision-independence questions.
+The API enforces state transitions, so clients cannot skip comparison or release
+a held transfer. States follow `review → ready → completed`, with `held` and
+`cancelled` alternatives. Amounts are positive integer grosz. NRB account numbers
+must pass checksum validation. Submit checks the balance and updates account and
+history atomically. Retrying a completed transfer never debits it again.
 
-Pole `risk` zwraca dwa odrębne heurystyczne wskaźniki 0–100, jeśli istnieje
-profil właściciela i wystarczająca telemetria. Wartości nie są skalibrowanym
-prawdopodobieństwem ani zwalidowanym detektorem. Poza sesją badania, przy
-niegotowym profilu lub skąpych danych wynik jest `null`, a odpowiedź zawiera
-`assessment_status`, `available_signals`, `missing_reasons`, wyjaśnienia i
-`available_modalities` i wersję mechanizmu. Scenariusz nie jest wejściem silnika oceny. Istniejący krok
-sprawdzenia danych, deklaracja samodzielności i kod OTP nadal są egzekwowane
-przez serwer. Przy wzroście wskaźnika presji przed `submit` serwer odsyła
-operację do sprawdzenia i unieważnia wcześniejszy kod.
+`risk` exposes separate experimental 0–100 comparison indicators when the relevant
+owner profile and telemetry exist. They are neither calibrated probabilities nor
+validated detection. Outside a study, without a ready profile or with sparse data,
+values remain `null`. The response describes `assessment_status`,
+`available_signals`, `missing_reasons`, explanations, `available_modalities` and
+model version. Scenario labels are not engine inputs. Comparison, independence
+confirmation and OTP requirements still apply. A pressure increase before submit
+returns the operation to review and invalidates its old code.
 
-## Badanie i operator
+## Study and operator
 
-Mutacje uczestnika wymagają bieżącej sesji Bank24 z CSRF i dozwolonym Origin.
-Operator API wymaga nagłówka `Authorization: Bearer <BANK24_ADMIN_TOKEN>`;
-mutacje operatora wymagają też Origin. Token ustaw przez zmienną środowiskową
-`BANK24_ADMIN_TOKEN` albo `--admin-token`. Bez tokenu API operatora jest
-wyłączone.
+Participant mutations require the current Bank24 session, CSRF and allowed Origin.
+Operator requests require `Authorization: Bearer <BANK24_ADMIN_TOKEN>`;
+operator mutations also require Origin. Configure `BANK24_ADMIN_TOKEN` or
+`--admin-token`. The operator API is disabled when no token is configured.
 
-| Metoda i ścieżka | Dane / rezultat |
+| Method and path | Input / result |
 | --- | --- |
-| POST `/api/admin/participants` (alias POST `/api/study/participants`) | `{label,role,bank_username}` dla istniejącego konta albo `{label,role,username,password,starting_balance_grosz?}` dla nowego; odpowiedź jednorazowo zawiera `study_code` |
-| GET `/api/admin/participants` | Lista bez kodów i haseł uczestników |
-| GET `/api/admin/scenarios` | Dozwolone scenariusze |
-| GET `/api/admin/profiles?bank_username=` | Wersja, gotowość, liczba obserwacji i mediany/MAD profilu per etap |
-| POST `/api/admin/participants/{id}/assignments` | `{scenario}`; operator przypisuje scenariusz przed sesją |
-| POST `/api/study/resolve-code` | `{code}`; uczestnik wiąże pre-login sesję z wydanym kodem |
-| POST `/api/study/consent` | `{telemetry:boolean,camera:boolean,recording:false?}`; zapisuje wersjonowany wybór zgód |
-| POST `/api/study/sessions` | `{}`; tworzy sesję z następnym przydzielonym scenariuszem |
-| POST `/api/study/sessions/{id}/start` | Uruchamia sesję i etap `login` |
-| POST `/api/study/sessions/{id}/stage` | `{stage:'transfer'|'result'}`; dozwolone są kolejne etapy |
-| POST `/api/study/sessions/{id}/complete` | Kończy sesję i odświeża profil właściciela, jeśli to kwalifikowana spokojna sesja |
-| POST `/api/study/sessions/{id}/abort` | `{reason?}`; kończy aktywną sesję jako przerwaną |
-| POST `/api/study/participants/{id}/withdraw` | Uczestnik usuwa własne dane po podaniu kodu; operator ma analogiczny endpoint `/api/admin/participants/{id}/withdraw` |
-| GET `/api/risk/study-sessions/{id}/latest` | Najnowsza ocena dostępna właścicielowi sesji |
-| GET `/api/risk/study-sessions/{id}/timeline` | Oceny i cechy z kolejnych etapów |
-| GET `/api/admin/sessions?participant_id=&offset=0&limit=30` | Paginowana lista sesji badania |
-| GET `/api/admin/sessions/{id}` | Szczegóły, zagregowane cechy, dozwolone metadane zdarzeń i oceny |
-| POST `/api/admin/sessions/{id}/abort` | `{reason?}`; operator kończy porzuconą sesję |
-| POST `/api/admin/exports` | `{participant_id?}` lub `{session_id?}`; pobiera JSON z sesjami, metadanymi, cechami i ocenami |
+| POST `/api/admin/participants` (alias POST `/api/study/participants`) | Existing account: `{label,role,bank_username}`; new: `{label,role,username,password,starting_balance_grosz?}`; returns `study_code` once |
+| GET `/api/admin/participants` | List without participant codes or passwords |
+| GET `/api/admin/scenarios` | Allowed scenarios |
+| GET `/api/admin/profiles?bank_username=` | Per-stage profile version, readiness, observations, medians and MAD |
+| POST `/api/admin/participants/{id}/assignments` | `{scenario}`; operator assigns before the session |
+| POST `/api/study/resolve-code` | `{code}`; links the pre-login session to an issued code |
+| POST `/api/study/consent` | `{telemetry:boolean,camera:boolean,recording:false?}`; saves versioned consent |
+| POST `/api/study/sessions` | `{}`; creates a session using the next assignment |
+| POST `/api/study/sessions/{id}/start` | Starts the session at `login` |
+| POST `/api/study/sessions/{id}/stage` | `{stage:'transfer'|'result'}`; stages must advance in order |
+| POST `/api/study/sessions/{id}/complete` | Completes and refreshes the baseline for eligible calm owner sessions |
+| POST `/api/study/sessions/{id}/abort` | `{reason?}`; aborts an active session |
+| POST `/api/study/participants/{id}/withdraw` | Participant deletes own data after supplying their code; operator equivalent: `/api/admin/participants/{id}/withdraw` |
+| GET `/api/risk/study-sessions/{id}/latest` | Latest assessment for the session owner |
+| GET `/api/risk/study-sessions/{id}/timeline` | Assessments/features across stages |
+| GET `/api/admin/sessions?participant_id=&offset=0&limit=30` | Paginated study sessions |
+| GET `/api/admin/sessions/{id}` | Details, aggregated features, allowed event metadata and assessments |
+| POST `/api/admin/sessions/{id}/abort` | `{reason?}`; ends an abandoned session |
+| POST `/api/admin/exports` | `{participant_id?}` or `{session_id?}`; JSON sessions, metadata, features and assessments |
 
-Scenariusze: `calm_owner`, `calm_dictation`, `pressure`, `intruder`. Wyłącznie
-operator może przypisać scenariusz; uczestnik nie wybiera go w żądaniu tworzenia
-sesji. `calm_owner` można przypisać tylko osobie oznaczonej przez operatora jako
-`role='owner'`. Do profilu trafiają ukończone sesje `calm_owner` z udzieloną
-zgodą i wystarczającą telemetrią; potrzeba co najmniej trzech obserwacji dla
-każdego etapu. Profil zapisuje wersję, mediany, MAD i zakres danych.
+Scenarios: `calm_owner`, `calm_dictation`, `pressure`, `intruder`. Only the operator
+assigns them. Session-creation requests cannot choose a scenario. `calm_owner`
+requires a participant marked `role='owner'`. Baselines use completed calm owner
+sessions with consent and sufficient telemetry: at least three observations per
+stage. Profiles store version, medians, MAD and data coverage.
 
-Ekstrakcja nie przechowuje treści pól. Zdarzenia zawierają typ interakcji,
-identyfikator pola, czas, długość wejścia, znormalizowany ruch wskaźnika i
-lokalnie obliczony czas przytrzymania klawisza. Kody i wartości wpisane przez
-uczestnika nie są częścią telemetrii. Odmowa lub cofnięcie zgody blokuje dalsze
-zbieranie i usuwa powiązane dane; cofnięcie udziału usuwa zdarzenia, oceny,
-przydziały i przelicza profile z pozostałych kwalifikowanych sesji.
+Feature extraction stores no field contents. Events contain interaction type,
+field ID, time, input length, normalized pointer movement and locally computed
+key dwell time. Typed codes and values are excluded. Refusal/withdrawal stops
+collection and deletes linked data. Participation withdrawal removes events,
+assessments and assignments, then rebuilds profiles from remaining eligible sessions.
 
-Ocena porównuje mediany z profilu właściciela przy użyciu MAD z dolnym progiem
-skali. Minimalna liczba zdarzeń i rozrzut cech są wymagane; brak profilu lub
-danych daje `null`, nigdy zerowy wynik. `account_takeover_risk` pochodzi z
-etapu logowania, a `coercion_risk` z etapu przelewu. Każda odpowiedź deklaruje
-`validated:false`, `model_version` i stan `limited` albo `insufficient_data`.
-To wskaźniki demonstracyjne, nie podstawa do deklarowania wykrycia oszustwa.
+Assessment compares owner medians using MAD with a minimum scale. Minimum event
+counts and feature coverage are required; missing data yields `null`, never zero.
+`account_takeover_risk` uses sign-in features and `coercion_risk` transfer features.
+Responses declare `validated:false`, `model_version`, and `limited` or
+`insufficient_data`. These demo indicators do not establish fraud.
 
-## Kamera i telemetria
+## Camera and telemetry
 
-Profil kamery konta: `GET /api/bank/camera-profile` zwraca status, liczbę próbek,
-wersję i informację, czy bieżąca sesja już dodała próbkę. `POST
-/api/bank/camera-profile/enroll/start` z `{ "confirm_calm": true }` zapisuje
-znacznik początku odrębnego pomiaru. `POST /api/bank/camera-profile/enroll`
-z takim samym potwierdzeniem zapisuje wyłącznie dane z rozpoczętego pomiaru.
-Wymagane jest zalogowanie kodem, aktywna kamera i co najmniej 40 sekund danych
-po znaczniku, z twarzą widoczną w większości okien analizy. Pomiar wygasa po
-10 minutach lub zmianie sesji kamery.
-Przyjmuje jedną próbkę na sesję logowania. Po trzech zatwierdzonych
-próbkach z oddzielnych sesji tworzy profil. W trybie demo pierwsze trzy próbki
-są zatwierdzane automatycznie; poza nim wymagają zatwierdzenia operatora.
-Kolejne próbki zawsze czekają na niezależną weryfikację operatora i dopiero
-zatwierdzenie tworzy nową wersję. Ocena modelu nie upoważnia do zmiany profilu.
-`GET /api/admin/camera-profile/candidates` zwraca oczekujące próbki;
-`POST /api/admin/camera-profile/candidates/{bank_session}/approve` z
-`{ "verified": true }` zatwierdza próbkę po weryfikacji poza modelem, a
-`DELETE /api/admin/camera-profile/candidates/{bank_session}` ją odrzuca.
-API zatwierdzania wymaga skonfigurowanego `BANK24_ADMIN_TOKEN`; bez operatora
-nie przyjmuje próbek, które miałyby czekać na zatwierdzenie bez końca.
-`DELETE /api/bank/camera-profile` usuwa próbki i wszystkie wersje z konta oraz
-stary plik profilu tego konta, jeśli istnieje.
-Ocena ryzyka jedynie odczytuje najnowszą wersję; brak profilu daje stan
-`insufficient_data`. Nowa wersja zaczyna służyć do oceny od następnego logowania;
-w sesji aktualizacji ocena korzysta z poprzedniej wersji, żeby nie porównywać
-nagrania z profilem utworzonym z tego samego nagrania. Dane są w SQLite, a starych automatycznie utworzonych plików
-profilu nie importujemy.
-Wynik samej kamery nie jest zwalidowany jako podstawa automatycznej blokady:
-może skierować do dodatkowej weryfikacji, ale nie wylogowuje. Wylogowanie
-przy syntetycznym alarmie pozostaje częścią demonstracji.
+`GET /api/bank/camera-profile` returns readiness, sample counts, version and whether
+the current session contributed a sample. POST
+`/api/bank/camera-profile/enroll/start` with `{"confirm_calm":true}` marks the start
+of a separate recording. POST `/api/bank/camera-profile/enroll` with the same
+confirmation saves only data after that marker. Code-verified sign-in, an active
+camera and at least 40 seconds of recording with a visible face across most
+analysis windows are required. Recordings expire after ten minutes or a camera
+session change. One sample is accepted per sign-in.
 
-`POST /api/webrtc/offer`, `GET /api/sessions/{id}/output` i
-`DELETE /api/sessions/{id}` wymagają pełnego logowania i osobnego `camera=true`.
-Gateway zapisuje właściciela ID i nie udostępnia cudzych wyników. Obraz bez
-dźwięku jest przesyłany do lokalnego serwera analizy; nagrania nie są zapisywane.
-WebSocket workera nie jest wystawiony do przeglądarki; frontend pobiera
-autoryzowane migawki co sekundę. Wyłączenie zgody zamyka kamerę.
+Three approved samples from separate sessions create a profile. Demo mode
+automatically approves the initial three; otherwise operator approval is required.
+Later samples always await independent operator verification before creating a
+version. The model's own score cannot authorize an update.
 
-`POST /api/telemetry/events` wymaga `telemetry=true` i przyjmuje
-`{page,page_anchor_ms,events:[...]}`, maksymalnie 100 zdarzeń. Dozwolone pola
-to `sequence`, `time_ms`, `type`, `stage`, `field` oraz opcjonalnie `length`,
-`duration_ms`, `x`, `y`; żadne wartości wpisanych pól nie są przyjmowane. Typy:
-input, correction, focus, pointer, key_press i key_dwell; etapy: login i
-transfer; pola podlegają allowliście. Współrzędne są znormalizowane 0–1.
-Duplikaty `(session,page,sequence)` są pomijane. Serwer dodaje kotwicę i czas
-odbioru oraz wiąże zdarzenia z aktywną sesją badania.
+- GET `/api/admin/camera-profile/candidates` lists pending samples.
+- POST `/api/admin/camera-profile/candidates/{bank_session}/approve` with `{"verified":true}` approves after independent verification.
+- DELETE `/api/admin/camera-profile/candidates/{bank_session}` rejects a candidate.
+
+Approval requires `BANK24_ADMIN_TOKEN`. Without an operator, samples that would
+wait indefinitely are not accepted. DELETE `/api/bank/camera-profile` removes all
+samples, versions and any legacy account profile file. Assessments only read
+profiles; missing profiles yield `insufficient_data`. New versions take effect at
+the next sign-in, preventing comparison against a profile containing the current
+recording. Data lives in SQLite; automatically created legacy profiles are not
+imported. Unvalidated camera results may request review but do not automatically
+sign users out. Synthetic alarm sign-out remains a demo feature.
+
+POST `/api/webrtc/offer`, GET `/api/sessions/{id}/output` and DELETE
+`/api/sessions/{id}` require full sign-in and separate `camera=true` consent.
+The gateway checks session ownership. Video has no audio and recordings are not
+saved. Worker WebSockets are not exposed directly; authenticated snapshots are
+available to the frontend. Revoking permission closes the camera.
+
+POST `/api/telemetry/events` requires `telemetry=true` and accepts
+`{page,page_anchor_ms,events:[...]}` with at most 100 events. Allowed fields:
+`sequence`, `time_ms`, `type`, `stage`, `field`, optionally `length`, `duration_ms`,
+`x`, `y`, `width`, `height`, `delta_y`, `env`, `status`, `keys`, `features`
+(as appropriate for the event type). Plaintext typed values are rejected. Types: input, correction, focus, pointer,
+key_press, key_dwell, pointerdown, pointerup, click, wheel, paste, copy, cut,
+window_blur, hidden, environment, ping, server_request and keyboard_window.
+Environment metadata uses an explicit browser/device allowlist. Keyboard windows
+carry 16–96 key identifiers and eight timing/category features per stroke;
+password fields are rejected. The server converts these transient inputs using
+`keystroke_long_epoch_59.pt` and persists only the resulting 128D embedding.
+Missing models return 503. Keyboard and mouse windows, interaction markers,
+connection timings and device metadata join the camera timeline for both
+explicit enrollment and live fusion scoring, only while telemetry consent is enabled.
+Stages: login, transfer. Fields use an allowlist. Coordinates
+are normalized to 0–1. Duplicate `(session,page,sequence)` entries are skipped.
+The server adds the time anchor/receipt time and links events to the active study.

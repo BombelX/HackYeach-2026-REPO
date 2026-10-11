@@ -26,9 +26,9 @@ export function Calibration() {
   return (
     <div className="study-shell">
       <div className="study-card">
-        <h1>Kalibracja kamery</h1>
+        <h1>Camera calibration</h1>
         <p className="lead">
-          Siedź spokojnie, twarzą do kamery, w świetle z przodu. Przez 20 sekund nic nie rób — to Twoja norma spoczynkowa.
+          Sit still facing the camera, with light from the front. Do nothing for 20 seconds to record your resting baseline.
         </p>
         <video ref={previewRef} className="cam-preview" style={{ position: "relative", left: 0, bottom: 0 }} muted playsInline />
         {!started ? (
@@ -39,11 +39,11 @@ export function Calibration() {
               void startCalibration();
             }}
           >
-            Włącz kamerę i zacznij
+            Turn on camera and start
           </button>
         ) : (
           <div className="progress-ring">
-            <p>Zostało {left} s</p>
+            <p>Remaining {left} s</p>
             <div className="bar">
               <span style={{ width: `${((SECONDS - left) / SECONDS) * 100}%` }} />
             </div>

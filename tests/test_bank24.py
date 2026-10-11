@@ -181,7 +181,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
                 check = await post('/bank/risk-check', headers, json={})
                 self.assertEqual((await check.json())['account_takeover_risk'], 10)
                 transfer = await post('/bank/transfers', headers, json={'recipient': 'North Studio sp. z o.o.', 'number': RECIPIENT,
-                                                                        'title': 'Faktura', 'amount_grosz': 1000})
+                                                                        'title': 'Invoice', 'amount_grosz': 1000})
                 self.assertEqual(transfer.status, 201)
                 transfer_id = (await transfer.json())['id']
                 model['p_not_owner'] = 0.85
@@ -211,6 +211,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
                     status = await (await bank.get('/api/bank/camera-profile')).json()
                     self.assertEqual(status['samples'], n - 1)
                     self.assertEqual(status['version'], None if n < 4 else 1)
+                    self.assertFalse(status['activates_next_sign_in'])
                     check = await post('/bank/risk-check', headers, json={})
                     if n < 4:
                         self.assertEqual((await check.json())['status'], 'insufficient_data')
@@ -226,6 +227,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(result['samples'], min(n, 3))
                     self.assertEqual(result['version'], None if n < 3 else 1)
                     self.assertTrue(result['recorded_this_session'])
+                    self.assertEqual(result['activates_next_sign_in'], n == 3)
                     if n == 4:
                         self.assertEqual(result['pending'], 1)
                         candidates = await bank.get('/api/admin/camera-profile/candidates', headers={
@@ -243,6 +245,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
                                                    json={'verified': True})
                         approved_body = await approved.json()
                         self.assertEqual((approved.status, approved_body['version'], approved_body['samples']), (200, 2, 4))
+                        self.assertTrue(approved_body['activates_next_sign_in'])
                     if n >= 3:
                         check = await post('/bank/risk-check', headers, json={})
                         checked = await check.json()
@@ -328,7 +331,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
         try:
             headers = await sign_in('1234')
             transfer = await (await post('/bank/transfers', headers, json={'recipient': 'North Studio sp. z o.o.', 'number': RECIPIENT,
-                                                                            'title': 'Faktura', 'amount_grosz': 1000})).json()
+                                                                            'title': 'Invoice', 'amount_grosz': 1000})).json()
             path = '/bank/transfers/' + transfer['id']
             await post(path + '/intervention', headers, json={'version': transfer['version'], 'independent': True, 'compared': True})
             challenge = await (await post(path + '/challenge', headers, json={})).json()
@@ -348,7 +351,7 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
             await worker.close()
 
     async def preview(self, amount=125000):
-        return await self.call('/bank/transfers', {'recipient': 'North Studio sp. z o.o.', 'number': RECIPIENT, 'title': 'Faktura FV/2026/104', 'amount_grosz': amount}, expected=201)
+        return await self.call('/bank/transfers', {'recipient': 'North Studio sp. z o.o.', 'number': RECIPIENT, 'title': 'Invoice FV/2026/104', 'amount_grosz': amount}, expected=201)
 
     async def ready(self, transfer):
         await self.call('/bank/transfers/' + transfer['id'] + '/intervention', {'version': transfer['version'], 'independent': True, 'compared': True})
@@ -456,12 +459,30 @@ class BankTests(unittest.IsolatedAsyncioTestCase):
     async def test_history_search_filters_before_pagination(self):
         await self.authenticate()
         db = self.app['store'].db
-        db.execute('INSERT INTO ledger VALUES(?,?,?,?,?,?,?)', ('older-match', 'demo-owner', 'Café Studio', 'Faktura 2026', -100, '2026-01-01T10:00:00Z', 'completed'))
-        db.execute('INSERT INTO ledger VALUES(?,?,?,?,?,?,?)', ('newer-nonmatch', 'demo-owner', 'Inny sklep', 'Zakupy', -200, '2026-10-01T10:00:00Z', 'completed'))
+        db.execute('INSERT INTO ledger VALUES(?,?,?,?,?,?,?)', ('older-match', 'demo-owner', 'Café Studio', 'Invoice 2026', -100, '2026-01-01T10:00:00Z', 'completed'))
+        db.execute('INSERT INTO ledger VALUES(?,?,?,?,?,?,?)', ('newer-nonmatch', 'demo-owner', 'Other shop', 'Shopping', -200, '2026-10-01T10:00:00Z', 'completed'))
         result = await self.call('/bank/transactions?q=cafe&direction=outgoing&limit=1&offset=0', method='GET')
         self.assertEqual(result['total'], 1)
         self.assertEqual(result['items'][0]['id'], 'older-match')
         self.assertEqual((await self.call('/bank/transactions?q=studio', method='GET'))['total'], 1)
+
+    async def test_multimodal_metadata_is_validated_and_keyboard_keys_not_stored(self):
+        await self.authenticate(telemetry=True)
+        base = dict(sequence=0, time_ms=100, stage='transfer', field='title')
+        events = [{**base, 'type': 'environment', 'env': {'platform': 'test', 'screen': {'width': 1920, 'height': 1080}}},
+                  {**base, 'sequence': 1, 'type': 'ping', 'duration_ms': 20},
+                  {**base, 'sequence': 2, 'type': 'keyboard_window', 'duration_ms': 90, 'length': 16,
+                   'keys': [66] * 16, 'features': [[3, 4, 2, 1, 0, 0, 0, 0]] * 16}]
+        with mock.patch('bank24_inputs.encode_keyboard', return_value=[0.1] * 128):
+            await self.call('/telemetry/events', dict(page='multimodal', page_anchor_ms=1000000, events=events))
+        saved = [json.loads(row['event']) for row in self.app['store'].db.execute('SELECT event FROM telemetry')]
+        keyboard = next(event for event in saved if event['type'] == 'keyboard_embedding')
+        self.assertEqual(len(keyboard['embedding']), 128)
+        self.assertNotIn('keys', keyboard)
+        self.assertNotIn('features', keyboard)
+        for invalid in [dict(events[2], field='password'), dict(events[2], keys=[66]),
+                        dict(events[0], keys=[66]), dict(events[0], env={'screen': 'invalid'})]:
+            await self.call('/telemetry/events', dict(page='invalid', events=[invalid]), expected=422)
 
     async def test_telemetry_consent_allowlist_dedup_withdraw(self):
         await self.authenticate(telemetry=True)

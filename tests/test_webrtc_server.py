@@ -37,8 +37,9 @@ class ProcessorTests(unittest.TestCase):
         self.assertTrue(np.any(np.all(frame == (255, 255, 0), axis=2)))
 
     @unittest.skipUnless(
-        (Path(__file__).resolve().parents[1] / 'third-party/rPPG-Toolbox/neural_methods/model/PhysNet.py').is_file()
-        and (Path(__file__).resolve().parents[1] / 'third-party/rPPG-Toolbox/final_model_release/UBFC-rPPG_PhysNet_DiffNormalized.pth').is_file(),
+        (Path(__file__).resolve().parents[1] / 'models/physnet/physnet.py').is_file()
+        and (Path(__file__).resolve().parents[1] / 'models/physnet/UBFC-rPPG_PhysNet_DiffNormalized.pth').is_file()
+        and (Path(__file__).resolve().parents[1] / 'models/physnet/UBFC-rPPG_PhysNet_DiffNormalized.pth').stat().st_size > 1024,
         'PhysNet source and checkpoint are absent; transport tests still run',
     )
     def test_physnet_inference_and_reset(self):

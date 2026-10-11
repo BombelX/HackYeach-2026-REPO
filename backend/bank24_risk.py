@@ -16,16 +16,16 @@ MIN_EVENTS = 8
 MIN_KEY_PRESSES = 5
 
 FEATURE_LABELS = {
-    'active_duration_s': 'czas aktywności formularza',
-    'key_press_count': 'liczba naciśnięć klawiszy',
-    'input_rate_per_min': 'tempo zmian pól',
-    'correction_rate': 'udział korekt',
-    'focus_changes': 'liczba zmian pola',
-    'pointer_distance': 'łączny dystans wskaźnika',
-    'pointer_pause_ratio': 'udział krótkich postojów wskaźnika',
-    'median_key_dwell_ms': 'mediana czasu przytrzymania klawisza',
-    'median_inter_key_ms': 'mediana odstępu między klawiszami',
-    'fields_touched': 'liczba użytych pól',
+    'active_duration_s': 'form active duration',
+    'key_press_count': 'key-press count',
+    'input_rate_per_min': 'field change rate',
+    'correction_rate': 'correction ratio',
+    'focus_changes': 'field-switch count',
+    'pointer_distance': 'total pointer distance',
+    'pointer_pause_ratio': 'short pointer pause ratio',
+    'median_key_dwell_ms': 'median key hold duration',
+    'median_inter_key_ms': 'median inter-key interval',
+    'fields_touched': 'number of fields used',
 }
 
 # Lower bounds keep a zero MAD from making a tiny difference look enormous.
@@ -142,11 +142,11 @@ def extract_features(db, study_session_id, stage):
     ready = len(events) >= MIN_EVENTS and key_press_count >= MIN_KEY_PRESSES and active_duration_s >= 1.0
     missing = []
     if len(events) < MIN_EVENTS:
-        missing.append('Za mało zdarzeń w tym etapie.')
+        missing.append('Not enough events in this stage.')
     if key_press_count < MIN_KEY_PRESSES:
-        missing.append('Za mało metadanych o naciśnięciach klawiszy.')
+        missing.append('Not enough key-press metadata.')
     if active_duration_s < 1.0:
-        missing.append('Brak wystarczającego zakresu czasu.')
+        missing.append('Insufficient time coverage.')
     return {
         'stage': stage,
         'event_count': len(events),
@@ -234,14 +234,14 @@ def compare_with_profile(current, profile):
     explanations = []
     for name, points, z, observed, center in sorted(deviations, key=lambda item: item[2], reverse=True):
         if z >= 2.0:
-            direction = 'więcej' if observed > center else 'mniej'
+            direction = 'more' if observed > center else 'less'
             explanations.append({
                 'feature': name,
                 'label': FEATURE_LABELS.get(name, name),
                 'observed': round(observed, 3),
                 'baseline_median': round(center, 3),
                 'deviation_mad': round(z, 2),
-                'message': f'{FEATURE_LABELS.get(name, name)}: {direction} niż typowo w profilu właściciela.',
+                'message': f'{FEATURE_LABELS.get(name, name)}: {direction} than typical for the owner profile.',
             })
         if len(explanations) == 4:
             break

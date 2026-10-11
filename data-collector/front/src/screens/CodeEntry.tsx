@@ -5,11 +5,11 @@ export function CodeEntry() {
   return (
     <div className="study-shell">
       <div className="study-card">
-        <p className="disclaimer">To nie jest prawdziwy bank. Strona zbiera dane do badania na HackYeah 2026.</p>
-        <h1>Bank24 — badanie zachowania</h1>
-        <p className="lead">Kliknij „Rozpocznij badanie”. Jeśli wracasz do przerwanego badania, wpisz swój kod uczestnika.</p>
+        <p className="disclaimer">This is not a real bank. This page collects research data at HackYeah 2026.</p>
+        <h1>Bank24 — behavioral study</h1>
+        <p className="lead">Click “Start study”. If you are returning to an interrupted study, enter your participant code.</p>
         <div className="field">
-          <label htmlFor="code">Kod uczestnika (opcjonalnie)</label>
+          <label htmlFor="code">Participant code (optional)</label>
           <input
             id="code"
             data-field="participant_code"
@@ -23,7 +23,7 @@ export function CodeEntry() {
         </div>
         {error && <p className="error">{error}</p>}
         <button className="btn" onClick={() => void loadParticipant()}>
-          {code.trim() ? "Dalej" : "Rozpocznij badanie"}
+          {code.trim() ? "Continue" : "Start study"}
         </button>
       </div>
     </div>

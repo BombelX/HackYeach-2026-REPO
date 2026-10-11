@@ -107,8 +107,8 @@ class Processor:
     """One stream's model, landmarks and pulse history; called on one worker."""
     def __init__(self, args):
         self.args = args
-        self.detector = load_face_detector(args.toolbox)
-        self.model = None if args.preview_only else load_model(args.toolbox, args.weights, args.device)
+        self.detector = load_face_detector()
+        self.model = None if args.preview_only else load_model(args.weights, args.device)
         self.analyzer = None if args.no_analysis else LandmarkDetector(args.pose_model, args.face_model)
         # estimate_bpm requires five seconds of signal. A fixed 128-frame
         # buffer holds only 4.27 s at 30 FPS, so it can never yield a pulse.
@@ -211,7 +211,8 @@ class Processor:
         self.trace.append(sample)
 
     def snapshot(self):
-        return dict(blendshapes=list(TRACE_BLENDSHAPES), samples=list(self.trace))
+        return dict(blendshapes=list(TRACE_BLENDSHAPES), samples=list(self.trace),
+                    started_epoch_ms=(time.time() - (time.monotonic() - self.started)) * 1000 if self.started is not None else None)
 
     def infer(self):
         n = len(self.frames) // 4 * 4
@@ -589,13 +590,12 @@ def parse_args(argv=None):
     parser.add_argument('--port', type=int, default=8080)
     parser.add_argument('--ssl-cert', type=Path, help='TLS certificate file for HTTPS camera access')
     parser.add_argument('--ssl-key', type=Path, help='TLS private key file for HTTPS camera access')
-    parser.add_argument('--toolbox', type=Path, default=ROOT.parent / 'third-party/rPPG-Toolbox')
     parser.add_argument('--weights', type=Path)
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
     parser.add_argument('--preview-only', action='store_true')
     parser.add_argument('--no-analysis', action='store_true')
-    parser.add_argument('--pose-model', type=Path, default=ROOT.parent / 'models/pose_landmarker_lite.task')
-    parser.add_argument('--face-model', type=Path, default=ROOT.parent / 'models/face_landmarker.task')
+    parser.add_argument('--pose-model', type=Path, default=ROOT.parent / 'models/mediapipe/pose_landmarker_lite.task')
+    parser.add_argument('--face-model', type=Path, default=ROOT.parent / 'models/mediapipe/face_landmarker.task')
     parser.add_argument('--fps', type=float, default=30)
     parser.add_argument('--window', type=float, default=10)
     parser.add_argument('--stride', type=int, default=1, help='legacy option; updates now run every 0.5 seconds')
@@ -616,13 +616,16 @@ def parse_args(argv=None):
         args.ice_servers = [RTCIceServer(**item) for item in json.loads(args.ice_servers)]
     except (TypeError, ValueError):
         parser.error('ice-servers must be a JSON array of RTCIceServer settings')
-    args.weights = args.weights or args.toolbox / 'final_model_release/UBFC-rPPG_PhysNet_DiffNormalized.pth'
+    args.weights = args.weights or ROOT.parent / 'models/physnet/UBFC-rPPG_PhysNet_DiffNormalized.pth'
     return args
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     args = parse_args()
+    import runpy
+    downloader = runpy.run_path(str(ROOT.parent / 'scripts/download_models.py'))
+    downloader['prepare_models'](args)
     torch.set_num_threads(args.threads)
     ssl_context = None
     if args.ssl_cert:

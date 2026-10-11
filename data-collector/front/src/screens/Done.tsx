@@ -5,10 +5,9 @@ export function Done() {
   return (
     <div className="study-shell">
       <div className="study-card">
-        <h1>Dziękujemy</h1>
+        <h1>Thank you</h1>
         <p className="lead">
-          To koniec badania{join ? ` dla ${join.code}` : ""}. Możesz zamknąć kartę. Jeśli chcesz usunąć swoje dane,
-          powiedz prowadzącemu swój kod.
+          The study is complete{join ? ` for ${join.code}` : ""}. You can close this tab. To delete your data, give your code to the facilitator.
         </p>
       </div>
     </div>

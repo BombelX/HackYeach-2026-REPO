@@ -6,39 +6,36 @@ export function Consent() {
   return (
     <div className="study-shell">
       <div className="study-card">
-        <h1>Zgoda na udział</h1>
+        <h1>Participation consent</h1>
         <p className="lead">
-          Uczestnik {join?.code}. Wszystkie dane logowania są fikcyjne i wygenerowane na potrzeby badania. Nie wpisuj
-          prawdziwego hasła bankowego.
+          Participant {join?.code}. All credentials are fictional and generated for this study. Do not enter your real banking password.
         </p>
         <p>
-          Zapisujemy ruchy myszy, czasy naciśnięć klawiszy (w tym kod klawisza, bo hasła są sztuczne), dane przeglądarki
-          i sieci, a opcjonalnie obraz z kamery oraz punkty twarzy i postawy. Dane są przypisane do pseudonimu, leżą na
-          naszym serwerze i możesz poprosić o ich usunięcie.
+          We record mouse movements, keystroke timing (including key codes because the passwords are artificial), browser and network data, and optionally camera video and face and pose landmarks. Data is linked to a pseudonym and stored on our server. You can request its deletion.
         </p>
         <label className="check">
           <input type="checkbox" checked={consents.study} onChange={() => toggle("study")} />
-          <span>Chcę wziąć udział w badaniu i rozumiem, że to nie jest prawdziwy bank.</span>
+          <span>I want to participate in the study and understand that this is not a real bank.</span>
         </label>
         <label className="check">
           <input type="checkbox" checked={consents.keyboard_mouse} onChange={() => toggle("keyboard_mouse")} />
-          <span>Zgoda na zapis klawiatury, myszy i zdarzeń w formularzu (wymagane).</span>
+          <span>I consent to recording keyboard, mouse and form events (required).</span>
         </label>
         <label className="check">
           <input type="checkbox" checked={consents.face_pose} onChange={() => toggle("face_pose")} />
-          <span>Zgoda na punkty twarzy, postawę i średni kolor skóry z kamery (bez wysyłania twarzy, jeśli nie wyrazisz zgody na wideo).</span>
+          <span>I consent to camera face landmarks, posture and average skin color (no face video is sent unless I consent to video).</span>
         </label>
         <label className="check">
           <input type="checkbox" checked={consents.video} onChange={() => toggle("video")} />
-          <span>Zgoda na nagranie wideo z kamery (osobna, opcjonalna). Wideo kasujemy po wyliczeniu tętna.</span>
+          <span>I consent to camera video recording (separate and optional). Video is deleted after pulse extraction.</span>
         </label>
         <label className="check">
           <input type="checkbox" checked={consents.motion} onChange={() => toggle("motion")} />
-          <span>Zgoda na czujniki ruchu telefonu (opcjonalne, tylko na telefonie).</span>
+          <span>I consent to phone motion sensors (optional, phone only).</span>
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn" onClick={goConsentNext}>
-          Akceptuję i zaczynam
+          Accept and start
         </button>
       </div>
     </div>

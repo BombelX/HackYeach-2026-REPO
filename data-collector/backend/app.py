@@ -386,7 +386,7 @@ def join(code: str):
         "SELECT * FROM participants WHERE code=? AND deleted_at IS NULL", (code.upper(),)
     ).fetchone()
     if not p:
-        raise HTTPException(404, "Nie znaleziono kodu uczestnika")
+        raise HTTPException(404, "Participant code not found")
     victim = None
     if p["victim_code"]:
         v = conn.execute("SELECT code, identity_json FROM participants WHERE code=?", (p["victim_code"],)).fetchone()
@@ -581,7 +581,7 @@ def session_video(session_id: str, _admin: bool = Depends(require_admin)):
     video_dir = storage.SESSIONS_DIR / session_id / "video"
     chunks = sorted(video_dir.glob("*.webm")) if video_dir.exists() else []
     if not chunks:
-        raise HTTPException(404, "brak nagrania dla tej sesji")
+        raise HTTPException(404, "No recording for this session")
 
     def stream():
         for path in chunks:

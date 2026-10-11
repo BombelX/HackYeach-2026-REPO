@@ -6,8 +6,8 @@ Dependencies: numpy scipy torch opencv-python (GUI build).
 Press q or Escape to exit. Estimates are experimental, not medical measurements.
 """
 import argparse
-from collections import deque
 import importlib.util
+from collections import deque
 import json
 import logging
 import math
@@ -87,10 +87,10 @@ def estimate_bpm(predictions, fs, prior=None, track_width=15.0):
     return float(frequencies[best] * 60)
 
 
-def load_model(toolbox, weights, device):
+def load_model(weights, device):
     device = resolve_device(device)
-    path = toolbox / 'neural_methods/model/PhysNet.py'
-    spec = importlib.util.spec_from_file_location('toolbox_physnet', path)
+    path = REPO_ROOT / 'models/physnet/physnet.py'
+    spec = importlib.util.spec_from_file_location('bank24_physnet', path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     model = module.PhysNet_padding_Encoder_Decoder_MAX(frames=128)
@@ -101,10 +101,9 @@ def load_model(toolbox, weights, device):
     return model.to(device).eval()
 
 
-def load_face_detector(toolbox):
-    """Some OpenCV distributions omit the cascade; use the toolbox copy."""
-    candidates = [toolbox / 'dataset/haarcascade_frontalface_default.xml',
-                  REPO_ROOT / 'models/haarcascade_frontalface_default.xml']
+def load_face_detector():
+    """Use the bundled cascade when OpenCV omits its own copy."""
+    candidates = [REPO_ROOT / 'models/haarcascade/haarcascade_frontalface_default.xml']
     data = getattr(cv2, 'data', None)
     if data is not None and hasattr(data, 'haarcascades'):
         candidates.append(Path(data.haarcascades) / 'haarcascade_frontalface_default.xml')
@@ -215,7 +214,6 @@ def inference_worker(model, device, jobs, results, stop, window_seconds):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--camera', type=int, default=0)
-    parser.add_argument('--toolbox', type=Path, default=REPO_ROOT / 'third-party/rPPG-Toolbox')
     parser.add_argument('--weights', type=Path, default=None)
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
     parser.add_argument('--fps', type=float, default=30, help='maximum model sampling rate; does not change camera settings')
@@ -224,8 +222,8 @@ def main():
     parser.add_argument('--stride', type=int, default=1, help='legacy option; updates now run every 0.5 seconds')
     parser.add_argument('--seed-bpm', type=float, default=0, help='placeholder BPM shown (marked with ~) until the first real reading; 0 disables')
     parser.add_argument('--min-frames', type=int, default=32, help='frames needed before the first estimate (multiple of 4; smaller = faster but rougher)')
-    parser.add_argument('--pose-model', type=Path, default=REPO_ROOT / 'models/pose_landmarker_lite.task')
-    parser.add_argument('--face-model', type=Path, default=REPO_ROOT / 'models/face_landmarker.task')
+    parser.add_argument('--pose-model', type=Path, default=REPO_ROOT / 'models/mediapipe/pose_landmarker_lite.task')
+    parser.add_argument('--face-model', type=Path, default=REPO_ROOT / 'models/mediapipe/face_landmarker.task')
     parser.add_argument('--no-analysis', action='store_true', help='disable landmark detection')
     parser.add_argument('--threads', type=int, default=4, help='PyTorch CPU threads')
     args = parser.parse_args()
@@ -235,9 +233,13 @@ def main():
     if args.min_frames < 16 or args.min_frames > 128 or args.min_frames % 4:
         parser.error('min-frames must be a multiple of 4 between 16 and 128')
     torch.set_num_threads(args.threads)
-    weights = args.weights or args.toolbox / 'final_model_release/UBFC-rPPG_PhysNet_DiffNormalized.pth'
-    model = None if args.preview_only else load_model(args.toolbox, weights, args.device)
-    detector = load_face_detector(args.toolbox)
+    weights = args.weights or REPO_ROOT / 'models/physnet/UBFC-rPPG_PhysNet_DiffNormalized.pth'
+    args.weights = weights
+    import runpy
+    downloader = runpy.run_path(str(REPO_ROOT / 'scripts/download_models.py'))
+    downloader['prepare_models'](args)
+    model = None if args.preview_only else load_model(weights, args.device)
+    detector = load_face_detector()
     # Use the platform's native backend and request MJPG at 640x480. Raw YUYV
     # over USB or virtual cameras is a common cause of torn, half-green frames.
     # FPS is deliberately left alone, since renegotiating it can corrupt frames.

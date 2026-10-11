@@ -1,149 +1,239 @@
-# Bank24 · HackYeah 2026
+# VarioLog · HackYeah 2026
 
-Demonstracja bankowości internetowej z analizą zachowania i opcjonalną kamerą.
-React + TypeScript, Python, SQLite oraz eksperymentalny model fuzji sygnałów.
-Przelewy i pieniądze w aplikacji są fikcyjne.
+A banking demonstration with behavioral analysis and an optional camera.
+Built with React, TypeScript, Python, SQLite and an experimental signal-fusion model.
+Accounts, transfers and money in the application are fictional.
+The interface and documentation are in English; amounts remain in PLN.
 
-![Panel demonstracyjny Bank24](docs/dashboard.png)
+![Bank24 demo dashboard](docs/dashboard.png)
 
-## Co jest w środku
+## Repository contents
 
-| Katalog | Zawartość |
+| Directory | Contents |
 | --- | --- |
-| `front/` | Aplikacja bankowa: logowanie, przelewy, historia, zgody, kamera |
-| `backend/` | API banku, SQLite i serwis kamery |
-| `data-collector/` | Osobna aplikacja do zbierania sesji badawczych |
-| `analyses/` | Trening modeli i analizy badawcze |
-| `models/` | Wagi modeli; pliki binarne obsługiwane przez Git LFS |
-| `third-party/` | rPPG-Toolbox z oryginalną licencją |
-| `tests/`, `docs/` | Testy integracyjne, dokumentacja API i raport weryfikacji |
+| [`frontend/`](frontend/README.md) | Banking app: setup, development, builds and browser tests |
+| [`backend/`](backend/README.md) | Banking API and camera worker: setup, configuration and tests |
+| `data-collector/` | Separate research session collection application |
+| `research/` | Model training, experiments and research tools; see [research layout](research/README.md) |
+| `models/` | Model assets, architecture code and licenses; binary formats use Git LFS |
+| `tests/` | Backend integration tests |
 
-## Wymagania
+## Requirements
 
-- Python 3.11–3.13 (weryfikacja lokalna: 3.13).
-- Node.js 22.12+ lub 24 LTS oraz npm dostępne w PATH.
-- Git i Git LFS, jeżeli pobierasz lub publikujesz wagi.
-- Kamera i GPU są opcjonalne. Podstawowy bank działa bez nich.
+- Python 3.11–3.13 (previous local verification used 3.13).
+- Node.js 22.12+ or 24 LTS, with npm available on PATH.
+- Git; Git LFS is needed for additional training checkpoints. Camera assets use the download script.
+- A camera and GPU are optional. Basic banking works without them.
 
-## Szybki start — Windows
+## 1. Download model files
 
-W katalogu projektu:
+First run the standalone downloader from the repository root.
+
+Linux / macOS:
+
+```bash
+python3 scripts/download_models.py
+```
+
+Windows:
 
 ```powershell
-python -m venv .venv-bank
-.\.venv-bank\Scripts\python.exe -m pip install -r backend/requirements-server.txt
-cd front
+python scripts/download_models.py
+```
+
+The script needs only the Python standard library. It does not require a virtual
+environment, extra packages or Git LFS. It prepares these folders:
+
+| Folder | Files |
+| --- | --- |
+| `models/mediapipe/` | Face and pose model bundles and license |
+| `models/physnet/` | Pulse checkpoint, `physnet.py` architecture and license |
+| `models/haarcascade/` | OpenCV face detector and license |
+
+Model and architecture downloads are verified with SHA-256. Valid local files
+are reused; Git LFS pointers are replaced with real assets. Downloads require
+internet access. Training experiment checkpoints are separate and use Git LFS.
+
+## 2. Install dependencies and start the bank
+
+Run these commands from the repository root.
+
+Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements-server.txt
+cd frontend
 npm ci
 npm run build
 cd ..
-.\.venv-bank\Scripts\python.exe backend/bank24_server.py --demo --origin http://127.0.0.1:8081
+.\.venv\Scripts\python.exe backend/bank24_server.py --demo --origin http://127.0.0.1:8081
 ```
 
-Otwórz **http://127.0.0.1:8081/**. Serwer podaje zbudowany frontend.
-
-| Pole | Dane demo |
-| --- | --- |
-| Login | `anna.demo` |
-| Hasło | `bank24` |
-| Kod logowania i przelewu | `1234` |
-
-Kod `4321` uruchamia demonstracyjny scenariusz alarmowy i odroczone wylogowanie.
-Stan banku zapisuje się w `backend/data/bank24.sqlite`.
-
-### Praca nad interfejsem
-
-Uruchom API bez zmiany domyślnego originu:
-
-```powershell
-.\.venv-bank\Scripts\python.exe backend/bank24_server.py --demo
-```
-
-W osobnym terminalu: `cd front`, `npm run dev`, a następnie otwórz
-**http://localhost:5173/**. Vite przekazuje `/api` do API na porcie 8081.
-
-### Linux / macOS
+Linux / macOS:
 
 ```bash
-python3 -m venv .venv-bank
-.venv-bank/bin/python -m pip install -r backend/requirements-server.txt
-(cd front && npm ci && npm run build)
-.venv-bank/bin/python backend/bank24_server.py --demo --origin http://127.0.0.1:8081
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements-server.txt
+(cd frontend && npm ci && npm run build)
+.venv/bin/python backend/bank24_server.py --demo --origin http://127.0.0.1:8081
 ```
 
-## Opcjonalna kamera
+Open **http://127.0.0.1:8081/**. The server serves the built frontend.
 
-Uruchom dodatkowy proces przed użyciem kamery w banku:
+| Field | Demo value |
+| --- | --- |
+| Username | `anna.demo` |
+| Password | `bank24` |
+| Sign-in and transfer code | `1234` |
+
+Code `4321` starts a synthetic alarm scenario with delayed sign-out.
+Bank state persists in `backend/data/bank24.sqlite`.
+
+### Frontend development
+
+Start the API with its default frontend origin:
 
 ```powershell
-.\.venv-bank\Scripts\python.exe backend/webrtc_server.py --host 127.0.0.1 --port 8080 --preview-only --device cpu
+.\.venv\Scripts\python.exe backend/bank24_server.py --demo
 ```
 
-`--preview-only` pomija PhysNet, zachowując analizę MediaPipe. Dodanie
-`--no-analysis` pozwala sprawdzić sam transport klatek. Dla pełnej estymacji
-pulsu usuń `--preview-only`; wymagane są wagi PhysNet i źródła toolboxa.
-Bank uruchamia kamerę po zalogowaniu, po zgodzie w procesie logowania i zgodzie przeglądarki. Brak kamery nie blokuje podstawowych operacji. Profile właściciela wymagają trzech jawnie
-zatwierdzonych próbek z osobnych sesji. Model fuzji jest sygnałem badawczym;
-wynik nie jest zwalidowanym prawdopodobieństwem oszustwa.
+On Linux/macOS use `.venv/bin/python` instead. In another terminal run
+`cd frontend` and `npm run dev`, then open **http://localhost:5173/**.
+Vite forwards `/api` requests to port 8081.
 
-## Kolektor sesji — osobna aplikacja
+## 3. Start the camera analysis service
+
+The camera analysis service runs separately from the banking API. Download the
+models in step 1 and install `backend/requirements-server.txt` in step 2 first.
+Leave the bank server running and open another terminal at the repository root
+(a third terminal if the Vite development server is also running).
+Start the camera worker on port 8080:
+
+Linux / macOS:
+
+```bash
+.venv/bin/python backend/webrtc_server.py --host 127.0.0.1 --port 8080 --device cpu
+```
+
+Windows:
 
 ```powershell
-.\.venv-bank\Scripts\python.exe -m pip install -r data-collector/backend/requirements.txt
+.\.venv\Scripts\python.exe backend/webrtc_server.py --host 127.0.0.1 --port 8080 --device cpu
+```
+
+Keep both the banking API and camera service running. Open
+**http://127.0.0.1:8081/** (or **http://localhost:5173/** during frontend
+development), sign in and allow camera access in the browser. These commands
+enable face landmarks, pose analysis and experimental pulse estimation on CPU.
+The worker checks required assets at startup and downloads missing files.
+
+Check **http://127.0.0.1:8080/health** to confirm the service is running. To test
+the camera independently of the bank, open **http://127.0.0.1:8080/** and select
+**Start camera**. Stop the service with `Ctrl+C` in its terminal.
+
+`--preview-only` disables PhysNet pulse estimation while retaining MediaPipe
+analysis. Add `--no-analysis` as well to test video transport alone.
+The PhysNet architecture is in `models/physnet/physnet.py`.
+See the [backend guide](backend/README.md#camera-worker) for more options.
+
+The camera starts after sign-in, subject to application consent and browser
+permission. Missing camera data does not block basic banking. Owner profiles
+require three explicitly approved samples from separate sign-ins. The fusion
+model is an experimental research signal, not a validated fraud probability.
+
+After saving the third approved sample, sign out and sign in again so the new
+profile can assess a separate recording. Keep the camera on while it collects
+fresh data. The Camera profile panel shows the live experimental mismatch score
+or explains why assessment is unavailable. Scoring also requires the actual
+fusion checkpoint at `research/training/artifacts/fusion/fusion_model.pt`; a
+Git LFS pointer alone is not a usable model.
+
+Enable the optional typing/mouse metadata permission at sign-in to provide the
+other fusion inputs: mouse movement/clicks, form interaction, browser/device
+information, connection RTT and request latency. Keyboard windows use the frozen
+encoder at `models/keystroke/long-run/keystroke_long_epoch_59.pt`; download it and
+the fusion checkpoint with:
+
+```bash
+git lfs pull --include="models/keystroke/long-run/keystroke_long_epoch_59.pt,research/training/artifacts/fusion/fusion_model.pt"
+```
+
+Non-password key identifiers and timing features are processed transiently into
+128-dimensional embeddings; only embeddings are saved, not those identifiers.
+Passwords and verification codes are excluded. At least 16 completed keystrokes
+in one supported field are needed for a keyboard window. Missing inputs stay
+masked. Existing enrollment samples retain their camera reference; new approved
+samples made with telemetry enabled add keyboard, mouse and device references.
+Withdrawing telemetry disables these live inputs and deletes session metadata.
+Scores remain experimental and are not calibrated fraud/manipulation probabilities.
+
+## Session collector — separate application
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r data-collector/backend/requirements.txt
 cd data-collector/front
 npm ci
 npm run build
 cd ../backend
-$env:ADMIN_PASSWORD = "wlasne-haslo-operatora"
-..\..\.venv-bank\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000
+$env:ADMIN_PASSWORD = "your-facilitator-password"
+..\..\.venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-Otwórz **http://127.0.0.1:8000/**. Tryb developerski: w osobnym terminalu
-`cd data-collector/front`, `npm run dev` i **http://localhost:5174/**.
-Dane kolektora trafiają do `data-collector/data/` i są wyłączone z Gita.
+Open **http://127.0.0.1:8000/**. For frontend development run
+`cd data-collector/front` and `npm run dev` in another terminal, then open
+**http://localhost:5174/**. Collector data is stored in `data-collector/data/`
+and excluded from Git. On Linux/macOS use the virtual environment's `bin/python`
+and set `ADMIN_PASSWORD` with your shell's environment syntax.
 
-## Testy
+## Tests
 
 ```powershell
-.\.venv-bank\Scripts\python.exe scripts/check_backend.py
-cd front
+.\.venv\Scripts\python.exe scripts/check_backend.py
+cd frontend
 npm run build
 npm test
 npx playwright install chromium
-$env:BANK24_PYTHON = (Resolve-Path ../.venv-bank/Scripts/python.exe).Path
+$env:BANK24_PYTHON = (Resolve-Path ../.venv/Scripts/python.exe).Path
 npm run test:e2e
 cd ../data-collector/front
 npm run build
 ```
 
-Na Linux/macOS ustaw `BANK24_PYTHON` na absolutną ścieżkę `.venv-bank/bin/python`.
-Przy zainstalowanym Chrome można ustawić `PLAYWRIGHT_CHANNEL=chrome` i pominąć
-pobieranie Chromium. Testy E2E uruchamiają własne serwery na portach 8080,
-8082 i 5180. Workflow GitHub Actions sprawdza backend, oba buildy i E2E.
+On Linux/macOS set `BANK24_PYTHON` to the absolute path of `.venv/bin/python`.
+With Chrome installed, set `PLAYWRIGHT_CHANNEL=chrome` to avoid downloading
+Chromium. E2E tests start their own servers on ports 8080, 8082 and 5180.
+GitHub Actions checks the backend, both frontend builds and E2E tests.
 
-## Publikacja na GitHubie
+## Publishing to GitHub
 
-Folder jest osobnym repozytorium na gałęzi `main`. W katalogu projektu:
+From the repository root, configure Git LFS before committing binary assets:
 
 ```powershell
 git lfs install
 git add .
 git commit -m "Prepare Bank24 application and research tools"
-git remote add origin https://github.com/TWOJ_LOGIN/TWOJE_REPO.git
-git push -u origin main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git push -u origin HEAD
 ```
 
-Wagi i checkpointy zajmują ponad 2 GB; ich wysyłka używa Git LFS.
-Po sklonowaniu użyj `git lfs pull`. Surowe dane, nagrania, profile uczestników,
-bazy SQLite, sekrety, środowiska i zależności są ignorowane przez `.gitignore`.
-Historia checkpointów została zachowana, tak jak w projekcie źródłowym.
+Skip `git remote add` if `origin` is already configured. Training weights and
+checkpoints exceed 2 GB and use Git LFS. Use `git lfs pull` if you need those
+research artifacts. Raw data, recordings, participant profiles, SQLite databases,
+secrets, virtual environments and dependencies are ignored by Git.
+The source project's checkpoint history has been preserved.
 
-## Dokumentacja i pochodzenie
+## Documentation and provenance
 
-- [Kontrakt API banku](backend/BANK24_API.md)
-- [Opis frontendu](front/README.md)
-- [Weryfikacja i poprawki](docs/VERIFICATION.md)
-- [Trening fuzji](analyses/training/fusion/README.md)
+- [Bank API contract](backend/BANK24_API.md)
+- [Frontend guide](frontend/README.md)
+- [Backend guide](backend/README.md)
+- [Fusion training](research/training/fusion/README.md)
+- [Research layout and limitations](research/README.md)
 
-Kod własny projektu nie ma jeszcze nadanej licencji. Kod zewnętrzny zachowuje
-swoje licencje w `third-party/rPPG-Toolbox/LICENSE` i `analyses/sapimouse/LICENSE`.
-Dane treningowe należy pozyskać osobno zgodnie z warunkami ich źródeł.
+Project-owned code has not yet been assigned a license. Third-party license
+texts are retained in `models/physnet/LICENSE`, `models/mediapipe/LICENSE`,
+`models/haarcascade/LICENSE` and `models/sapimouse/LICENSE`.
+Obtain training data separately under the terms of its sources.
+See [the license review](models/licenses/README.md) for unresolved use restrictions;
+PhysNet license compliance has not been established.

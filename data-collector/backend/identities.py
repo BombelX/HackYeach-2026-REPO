@@ -22,8 +22,8 @@ STREETS = [
 CITIES = ["Kraków", "Warszawa", "Wrocław", "Gdańsk", "Poznań", "Łódź"]
 PAYEE_NAMES = [
     "Tauron Sprzedaż sp. z o.o.", "Netia S.A.", "ZUS",
-    "Wspólnota Mieszkaniowa Rynek 12", "Play / P4 sp. z o.o.",
-    "Lecznica Weterynaryjna Vega", "Szkoła językowa Lingua",
+    "Market Square 12 Housing Association", "Play / P4 sp. z o.o.",
+    "Vega Veterinary Clinic", "Lingua Language School",
 ]
 
 
@@ -101,15 +101,15 @@ def make_identity(seed: str | None = None) -> dict[str, Any]:
         "balance": balance,
         "payees": own_payees,
         "invoice": {
-            "issuer": "Faktura VAT 2026/" + _digits(4, rng),
-            "name": rng.choice(["Studio Graficzne Pixel", "Hydraulika Nowak", "Księgowość Plus"]),
+            "issuer": "Invoice VAT 2026/" + _digits(4, rng),
+            "name": rng.choice(["Pixel Design Studio", "Nowak Plumbing", "Accounting Plus"]),
             "nrb": invoice_nrb,
             "nrb_display": _format_nrb(invoice_nrb),
             "amount": round(rng.uniform(180, 2400), 2),
             "title": "FV " + _digits(4, rng) + "/10/2026",
         },
         "tech_account": {
-            "name": "Rachunek techniczny Bank24 — Odzysk środków",
+            "name": "Bank24 technical account — Funds recovery",
             "nrb": tech_nrb,
             "nrb_display": _format_nrb(tech_nrb),
         },

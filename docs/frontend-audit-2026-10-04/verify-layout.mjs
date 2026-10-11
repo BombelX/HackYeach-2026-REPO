@@ -10,15 +10,15 @@ const results = [];
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   await page.goto('http://localhost:5181/study');
-  await page.getByLabel('Kod uczestnika').fill('DEMO-24');
-  await page.getByRole('button', { name: 'Rozpocznij', exact: true }).click();
+  await page.getByLabel('Participant code').fill('DEMO-24');
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
   await page.getByLabel('Rozumiem zasady').check();
-  await page.getByRole('button', { name: 'Przejdź do logowania' }).click();
+  await page.getByRole('button', { name: 'Go to sign in' }).click();
   await page.getByLabel('Login', { exact: true }).fill('anna.demo');
-  await page.getByLabel('Hasło', { exact: true }).fill('bank24');
-  await page.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
-  await page.getByLabel('Kod potwierdzenia', { exact: true }).fill('1234');
-  await page.getByRole('button', { name: 'Potwierdź logowanie' }).click();
+  await page.getByLabel('Password', { exact: true }).fill('bank24');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByLabel('Confirmation code', { exact: true }).fill('1234');
+  await page.getByRole('button', { name: 'Confirm sign-in' }).click();
   await page.waitForURL('**/app');
   results.push({ name: 'dashboard-focus', active: await page.evaluate(() => ({ tag: document.activeElement.tagName, text: document.activeElement.textContent?.slice(0,100) })) });
   for (const width of [390, 768, 1024]) {

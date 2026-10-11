@@ -2,8 +2,8 @@
 
 The camera worker records per-frame pulse, face blendshapes, posture and face boxes. This module
 writes them in the processed-session layout read by ``training.fusion.features`` and scores them
-with ``predict_suspicious``. Only camera modalities are available here: keyboard, mouse, context
-and device inputs are absent and therefore masked, so the result is an experimental review signal,
+with ``predict_suspicious``. Consented keyboard embeddings, mouse, context, network and device metadata are joined
+to the camera timeline when available; missing inputs are masked. The result is an experimental review signal,
 not a fraud probability.
 
 Owner profiles are built only through the explicit enrolment endpoint. Each sample comes from a
@@ -22,10 +22,19 @@ import pandas as pd
 
 POSTURE = ('head_shoulder_ratio', 'head_tilt_degrees', 'shoulder_tilt_degrees', 'shoulder_width_normalized')
 PROBE_SECONDS = 120.0
-MODEL_LABEL = 'fusion-transformer-camera (inference_xgb_suspicious)'
+MODEL_LABEL = 'fusion-transformer-multimodal (inference_xgb_suspicious)'
 
 class CameraRiskUnavailable(Exception):
     """Not enough camera data (or model missing) to score."""
+
+
+def require_checkpoint(fusion_repo: Path):
+    checkpoint = Path(fusion_repo) / 'training/artifacts/fusion/fusion_model.pt'
+    if not checkpoint.is_file():
+        raise CameraRiskUnavailable('The fusion checkpoint is missing. Download the research model with Git LFS.')
+    with checkpoint.open('rb') as source:
+        if source.read(80).startswith(b'version https://git-lfs.github.com/spec/v1'):
+            raise CameraRiskUnavailable('The fusion checkpoint is only a Git LFS pointer. Download the actual research model with Git LFS.')
 
 
 def _import_model(fusion_repo: Path):
@@ -77,6 +86,8 @@ def write_session(trace: dict[str, Any], directory: Path, start_ms: float = 0.0,
     pd.DataFrame(timeline).to_parquet(directory / 'timeline.parquet')
     pd.DataFrame(frames, columns=['t_session_ms', 'face_detected', 'face_bbox_pixels', 'width']).to_parquet(
         directory / 'frames.parquet')
+    from bank24_inputs import write_inputs
+    write_inputs(trace, directory, start_ms, end_ms if end_ms is not None else (float(samples[-1]['t']) + 1 if samples else start_ms))
     return len(samples)
 
 
@@ -87,32 +98,32 @@ def build_enrollment_sample(trace: dict[str, Any], participant: str, fusion_repo
     samples = [sample for sample in trace.get('samples') or []
                if sample.get('t') is not None and float(sample['t']) >= start_ms]
     if not samples:
-        raise CameraRiskUnavailable('Kamera nie przesłała jeszcze danych do analizy.')
+        raise CameraRiskUnavailable('The camera has not sent analysis data yet.')
     if float(samples[-1]['t']) - max(start_ms, float(samples[0]['t'])) < 40_000:
-        raise CameraRiskUnavailable('Do zapisu próbki potrzeba co najmniej 40 s spokojnego nagrania z widoczną twarzą.')
+        raise CameraRiskUnavailable('Saving a sample requires at least 40 seconds of calm recording with a visible face.')
     with tempfile.TemporaryDirectory(prefix='bank24-camera-') as tmp:
         tmp = Path(tmp)
         write_session(trace, tmp / 'enrol', start_ms)
         windows = build_session_windows(tmp / 'enrol', dict(session_id='enrol', participant_code=participant,
                                                             condition='calm_1'))
         if windows is None or len(windows.starts) == 0:
-            raise CameraRiskUnavailable('Za mało danych z widoczną twarzą do zapisania próbki profilu.')
+            raise CameraRiskUnavailable('Not enough data with a visible face to save a profile sample.')
         visible_windows = int(np.count_nonzero(windows.face_mask))
         if visible_windows < 3 or visible_windows * 2 < len(windows.starts):
-            raise CameraRiskUnavailable('Twarz musi być widoczna w większości pomiaru, przez co najmniej trzy okna analizy.')
+            raise CameraRiskUnavailable('Your face must be visible for most of the recording, across at least three analysis windows.')
         # Training split a calm session into enrolment/probe halves. Here the probe is a future
         # login, so the whole explicitly started calm recording can contribute to the profile.
         windows.split_ms = float(windows.starts[-1] + window_ms)
         profile = build_profile(windows)
         if profile is None or profile.face_mask <= 0:
-            raise CameraRiskUnavailable('Za mało danych z widoczną twarzą do zapisania próbki profilu.')
+            raise CameraRiskUnavailable('Not enough data with a visible face to save a profile sample.')
         return profile
 
 
 def combine_samples(samples: list, participant: str):
     """Mean available camera features across trusted recordings; missing modalities stay masked."""
     if not samples or any(sample.participant != participant for sample in samples):
-        raise ValueError('Próbki muszą należeć do jednego właściciela.')
+        raise ValueError('Samples must belong to one owner.')
     from training.fusion.features import Profile  # imported after _import_model has set the path
 
     def mean(name):
@@ -128,28 +139,29 @@ def combine_samples(samples: list, participant: str):
     if kb_mask:
         kb /= max(float(np.linalg.norm(kb)), 1e-8)
     return Profile(participant, 'trusted-enrolment', kb, kb_mask, mouse, mouse_mask,
-                   pulse, pulse_mask, face, face_mask, samples[-1].device)
+                   pulse, pulse_mask, face, face_mask, next((sample.device for sample in reversed(samples) if sample.device), {}))
 
 
 def assess_camera(trace: dict[str, Any], participant: str, fusion_repo: Path, profile,
                   start_ms: float | None = None) -> dict[str, Any]:
     """Score against an existing profile without changing it."""
+    require_checkpoint(fusion_repo)
     inference, _, _, window_ms = _import_model(fusion_repo)
     samples = trace.get('samples') or []
     if not samples:
-        raise CameraRiskUnavailable('Kamera nie przesłała jeszcze danych do analizy.')
+        raise CameraRiskUnavailable('The camera has not sent analysis data yet.')
     if profile.participant != participant:
-        raise CameraRiskUnavailable('Profil nie należy do tego konta.')
+        raise CameraRiskUnavailable('The profile does not belong to this account.')
     duration = float(samples[-1]['t'])
     probe_start = max(start_ms or 0.0, duration - PROBE_SECONDS * 1000)
     with tempfile.TemporaryDirectory(prefix='bank24-camera-') as tmp:
         tmp = Path(tmp)
         if write_session(trace, tmp / 'probe', probe_start) == 0 or duration - probe_start < window_ms / 2:
-            raise CameraRiskUnavailable('Za mało nowych danych z kamery do oceny przelewu.')
+            raise CameraRiskUnavailable('Not enough new camera data to assess the transfer.')
         try:
             result = inference.predict_suspicious(tmp / 'probe', profile)
         except ValueError as exc:
-            raise CameraRiskUnavailable('Za mało danych z kamery do oceny przelewu.') from exc
+            raise CameraRiskUnavailable('Not enough camera data to assess the transfer.') from exc
     result.update(profile_enrolled_now=False, probe_seconds=round((duration - probe_start) / 1000, 1),
                   profile_session=profile.session_id)
     result.pop('model_path', None)
@@ -171,16 +183,17 @@ def risk_from_camera(result: dict[str, Any], model_version: str = MODEL_LABEL) -
     if pressure >= 70:
         interventions.append('independent_recipient_check')
     reasons = [
-        f"Model fuzji (kamera: tętno, mimika, postawa) porównał ostatnie {result['probe_seconds']} s "
-        f"z profilem właściciela.",
-        f"Wynik przeglądu {result['review_score']:.2f} przy progu {result['review_threshold']:.2f}"
-        + (' — zalecana dodatkowa weryfikacja.' if review else ' — poniżej progu.'),
+        f"The fusion model (camera: pulse, expression, posture) compared the last {result['probe_seconds']} s "
+        f"with the owner profile.",
+        f"Review score {result['review_score']:.2f} at threshold {result['review_threshold']:.2f}"
+        + (' — additional verification recommended.' if review else ' — below threshold.'),
     ]
-    reasons.append('Brak danych klawiatury, myszy i urządzenia — te modalności są pominięte.')
-    reasons.append('Wskaźniki są eksperymentalne i niezwalidowane; nie są prawdopodobieństwem oszustwa.')
+    signals = result.get('available_signals', ['camera_pulse', 'camera_face'])
+    reasons.append('Available inputs: ' + ', '.join(signals) + '. Missing inputs are masked.')
+    reasons.append('Indicators are experimental and unvalidated; they are not fraud probabilities.')
     return dict(
         account_takeover_risk=nonowner, coercion_risk=pressure, assessment_status='limited', quality='limited',
-        available_signals=['camera_pulse', 'camera_face'], missing_reasons=[],
+        available_signals=signals, missing_reasons=[],
         action='additional_verification' if review else 'standard_confirmation',
         recommended_interventions=interventions, reasons=reasons, explanations=[],
         model_version=model_version, validated=False, assessed_at=time.time(),

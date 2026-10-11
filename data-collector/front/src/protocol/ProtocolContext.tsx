@@ -81,7 +81,7 @@ export function ProtocolProvider({ children }: { children: ReactNode }) {
 
   const openSession = useCallback(
     async (cond: string, orderIndex: number) => {
-      if (!join) throw new Error("brak uczestnika");
+      if (!join) throw new Error("participant missing");
       if (recRef.current) {
         await recRef.current.stop();
         recRef.current = null;
@@ -124,7 +124,7 @@ export function ProtocolProvider({ children }: { children: ReactNode }) {
 
   const goConsentNext = () => {
     if (!consents.study || !consents.keyboard_mouse) {
-      setError("Do udziału potrzebna jest zgoda na badanie oraz zapis klawiatury i myszy.");
+      setError("Participation requires study consent and consent to keyboard and mouse recording.");
       return;
     }
     setError(null);

@@ -1,7 +1,7 @@
 # Raw data, recordings and derived participant/session data
-data/
-datasets/
-dataset/
+/data/
+/datasets/
+/dataset/
 **/data/
 **/datasets/
 **/dataset/
@@ -11,12 +11,15 @@ dataset/
 **/input_csv_mouse/
 **/sapimouse/user*/
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
 *.db
+*.db-shm
+*.db-wal
 *.jsonl
-training/artifacts/fusion/windows_*.pkl
-training/artifacts/mouse_boost/enrollment_profiles.parquet
-third-party/rPPG-Toolbox/model_outputs/
-third-party/rPPG-Toolbox/tools/output_signal_viz/sample_output.pickle
+research/training/artifacts/fusion/windows_*.pkl
+research/training/artifacts/mouse_boost/enrollment_profiles.parquet
+**/09_top_outlier_sessions.csv
 
 # Secrets and machine-specific configuration
 .env
@@ -27,7 +30,7 @@ third-party/rPPG-Toolbox/tools/output_signal_viz/sample_output.pickle
 turn_secret
 
 # Environments, dependencies and generated build/cache files
-.venv/
+.venv*/
 venv/
 **/.venv/
 **/node_modules/
@@ -40,13 +43,4 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 .impeccable/
-
-# Local environments and analysis outputs
-.venv*/
 *.log
-analyses/training/artifacts/fusion/windows_*.pkl
-analyses/training/artifacts/mouse_boost/enrollment_profiles.parquet
-
-# Session-level EDA outputs
-**/09_top_outlier_sessions.csv
-

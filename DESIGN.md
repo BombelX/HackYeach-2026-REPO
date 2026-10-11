@@ -26,97 +26,30 @@ typography:
   balance: "clamp(32px, 4vw, 43px), tabular figures"
 ---
 
-# Bank24 — wdrożony system interfejsu
+# Bank24 — implemented interface design
 
-## Charakter
+The supplied Bank24 mockups guide the hierarchy and composition: light surfaces, a cool neutral background, navy actions and restrained teal. The application uses real demo data and native HTML/CSS. Camera panels show the actual stream; risk displays and security claims must reflect available evidence.
 
-Interfejs bierze hierarchię i kompozycję z planszy mockupów użytkownika:
-jasne powierzchnie, chłodne neutralne tło, granatowe akcje i oszczędny teal.
-Układ wykorzystuje prawdziwe dane demo i zwykłe HTML/CSS. Nie naśladuje
-obrazka z makiety jako nieinteraktywnego zrzutu. Nie używa stockowej fotografii
-w module kamery, fikcyjnych wykresów ryzyka ani komunikatów obiecujących
-wykrywanie oszustw.
+The public landing page at `/` works without the banking API and leads directly to sign-in. Authenticated screens use a consistent bank shell. PLN currency and Polish account-number validation remain part of the banking domain; interface text is English.
 
-Publiczny landing pod `/` działa bez pobierania sesji lub API. Prowadzi do
-logowania, a następnie przez kod do dashboardu. Bankowość ma oddzielny nagłówek,
-nawigację boczną, treść i stopkę. Kamera jest opcjonalnym modułem tylko podczas
-nowego przelewu; gdy pracuje, jej status oraz przycisk Wyłącz pozostają w
-nagłówku bankowym.
+## Components and pages
 
-## Tokeny i komponenty
+Use the tokens above and local IBM Plex Sans. Buttons and fields have clear focus, pending, disabled and error states. Keep one main heading and primary task per screen. Error messages explain recovery and associate with their fields. Display unavailable measurements explicitly rather than as zero.
 
-- Font: IBM Plex Sans, lokalne pliki WOFF2 w `frontend/public/brand/`.
-- Baza: tło `#f5f7f7`, białe karty, tekst `#102b43`, opisy `#647786` i linie
-  `#d8e1e5`.
-- Akcja główna: granat `#062f4c`; interakcje i linki: ciemny teal `#00645f`.
-  Mięta `#b6e4da` występuje oszczędnie na karcie konta.
-- Zieleń, bursztyn i czerwień są zarezerwowane dla komunikatów stanu. Brak
-  wyniku modelu jest opisywany tekstem i nie dostaje zielonego stanu.
-- Kontrolki mają minimum 44 px wysokości, promień 5 px i widoczny focus.
-  Panele mają delikatną krawędź, niewielki promień i nie polegają na cieniu.
-- Nagłówki zadań są responsywne; kwoty i numery rachunków używają cyfr
-  tabelarycznych. Informacje dodatkowe są spokojniejsze i nie konkurują z CTA.
+The landing page combines a landscape, native headings and links, a clearly illustrative account view, and a short explanation of SafeTransfer. Do not imply guaranteed fraud detection. Login uses a compact form with password visibility, remembered-device choice, help and a separate verification-code step. Demo credentials belong in a disclosure.
 
-## Strony
+The account page shows the actual balance, account number, working copy action, recent transactions and monthly totals. History provides working search and filters. Transfer pages follow details, review and confirmation, with invoice context close to the form. Results emphasize status, amount and recipient; technical identifiers belong in details.
 
-### Landing
+Camera controls are optional and explicit. The transfer page contains the supporting camera panel; the header provides global status and a stop action. Experimental parameters are collapsed by default. Heart rate, face presence, posture and expressions are measurements, not identity verification or proof of coercion.
 
-Nagłówek ma logo, kotwice do treści i jeden przycisk logowania. Hero składa się
-z krótkiej obietnicy, jasnej ścieżki do logowania oraz lokalnej fotografii
-górskiego jeziora z drobną kartą fikcyjnego rachunku. Treści są tekstem HTML i
-na telefonie układają się pod sobą. Dalsze sekcje opisują działające możliwości,
-bez sugerowania realnych produktów lub zwalidowanej ochrony.
+## Responsive behavior and accessibility
 
-Obraz `frontend/public/brand/bank24-landscape.png` wygenerowano narzędziem
-ImageGen na potrzeby tego landing page. Prompt: “Premium editorial landscape
-photograph for a fictional Polish digital bank landing page: Lake Czorsztyn
-and the Tatra Mountains at a quiet early sunrise, calm water, soft blue-green
-palette, subtle mist, sophisticated natural light, generous open sky, realistic
-photography, no text, no logos, no people, wide 16:9 composition.”
+Below 1150 px, move the supporting camera panel below the task. Below 800 px, compact navigation and the sidebar. Below 560 px, use one column. Support 320 px screens, 200% zoom, long values, visible keyboard focus, reduced motion and touch targets of at least 44 × 44 px. Never hide layout defects with clipping. Forms and text remain native and accessible.
 
-### Logowanie
+## Assets and sources of truth
 
-Samodzielny, wąski panel formularza, na spokojnym tle. Login i hasło są
-głównym zadaniem; zapamiętanie urządzenia i pomoc są łatwe do odnalezienia.
-Telemetria jest niezaznaczoną opcją z opisem zakresu. Demo credentials
-pojawiają się w małej, wyraźnie opisanej sekcji. OTP ma jeden dostępny input,
-autofill, filtr znaków, licznik, ponowienie i długość pobieraną z API.
+Implementation: `frontend/src/design/`, `frontend/src/layouts/` and feature pages. Product behavior: `backend/PRODUCT.md`; API: `backend/BANK24_API.md`. Historical audits document earlier states rather than current acceptance results.
 
-### Konto i historia
+The landscape was generated with this prompt:
 
-Dashboard pokazuje saldo, rachunek i wyraźny CTA nowego przelewu. Podsumowanie
-miesiąca wylicza różnicę z realnych wartości i pokazuje pusty stan, gdy nie ma
-operacji. Lista transakcji ma czytelne kwoty oraz etykiety. Kopiowanie rachunku
-ma prawdziwy przycisk i komunikat dostępnościowy. Historia wyszukuje na serwerze
-przed paginacją; filtry mają stan w URL i działają klawiaturą.
-
-### Przelew i kamera
-
-Formularz i faktura są widoczne obok siebie na szerokim ekranie. Ekran
-sprawdzenia łączy podsumowanie, stan niezwalidowanej oceny ryzyka, porównanie
-danych i pytanie o samodzielność decyzji. Serwer nadal wymusza przejście
-`review → ready/held`; po zgodzie na przejście wydawany jest kod, potem wynik.
-Użytkownik może edytować lub anulować. Kamera uruchamia się dopiero po osobnej
-zgodzie, używa video-only transportu i wyświetla stan, awarię oraz świeżość
-wyniku. Każdy ekran bankowy zapewnia skrót Wyłącz, gdy kamera działa.
-
-## Responsywność i dostępność
-
-- Szerokość dokumentu nie może przekraczać viewportu od 320 px wzwyż.
-- Poniżej 1150 px panel kamery schodzi pod zadanie; poniżej 800 px nawigacja
-  bankowa i sidebar przechodzą w kompaktowe paski; poniżej 560 px wszystkie
-  główne siatki układają się w jedną kolumnę.
-- Tabela historii zmienia wąskie wiersze w podpisane karty. Pola oraz długie
-  wartości mogą się zawijać.
-- Każdy widok ma jeden nagłówek H1, skip link, czytelny focus, etykiety pól,
-  komunikaty statusu i informację niezależną od koloru. Ograniczamy ruch dla
-  `prefers-reduced-motion`.
-- Podstawowa nawigacja i formularze działają klawiaturą. Ważne cele dotykowe
-  mają co najmniej 44 px wysokości.
-
-## Źródła prawdy
-
-`frontend/src/design/styles.css` jest źródłem aktualnych tokenów i breakpointów;
-komponenty i zachowanie opisuje kod w `frontend/src/`. `mockups/` i
-`FRONTEND_REIMPLEMENTATION_PLAN.md` są materiałem referencyjnym, a stary audyt
-w `docs/frontend-audit-2026-10-04/` pozostaje zapisem stanu przed zmianą.
+> Premium editorial landscape photograph for a fictional Polish digital bank landing page: Lake Czorsztyn and the Tatra Mountains at a quiet early sunrise, calm water, soft blue-green palette, subtle mist, sophisticated natural light, generous open sky, realistic photography, no text, no logos, no people, wide 16:9 composition.

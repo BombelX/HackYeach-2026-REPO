@@ -89,7 +89,7 @@ export class SessionRecorder {
           },
         });
       } catch (err) {
-        this.lastError = "Kamera niedostępna: " + String(err);
+        this.lastError = "Camera unavailable: " + String(err);
       }
     }
     this.flushTimer = window.setInterval(() => void this.flush(), 1200);

@@ -86,19 +86,19 @@ export function ChatPanel(props: {
             {l.text}
           </div>
         ))}
-        {typing && <div className="chat-line them typing">pisze…</div>}
+        {typing && <div className="chat-line them typing">typing…</div>}
       </div>
       <div className="chat-input">
         <input
           data-field="chat_reply"
           autoComplete="off"
-          placeholder="Napisz wiadomość…"
+          placeholder="Write a message…"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
         />
         <button className="btn" onClick={send}>
-          Wyślij
+          Send
         </button>
       </div>
     </div>

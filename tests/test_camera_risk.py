@@ -8,7 +8,7 @@ import pandas as pd
 import bank24_camera_risk as camera_risk
 from webrtc_server import TRACE_BLENDSHAPES, posture_metrics
 
-FUSION_REPO = Path(__file__).resolve().parents[1] / 'analyses'
+FUSION_REPO = Path(__file__).resolve().parents[1] / 'research'
 
 
 def trace(seconds, bpm=72.0):
@@ -24,6 +24,19 @@ def trace(seconds, bpm=72.0):
 
 
 class CameraRiskTest(unittest.TestCase):
+    def test_missing_checkpoint_has_actionable_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(camera_risk.CameraRiskUnavailable, 'checkpoint is missing'):
+                camera_risk.require_checkpoint(Path(directory))
+
+    def test_lfs_pointer_is_not_treated_as_a_model(self):
+        with tempfile.TemporaryDirectory() as directory:
+            checkpoint = Path(directory) / 'training/artifacts/fusion/fusion_model.pt'
+            checkpoint.parent.mkdir(parents=True)
+            checkpoint.write_text('version https://git-lfs.github.com/spec/v1\noid sha256:' + '0' * 64 + '\nsize 100\n')
+            with self.assertRaisesRegex(camera_risk.CameraRiskUnavailable, 'Git LFS pointer'):
+                camera_risk.require_checkpoint(Path(directory))
+
     def test_write_session_layout(self):
         with tempfile.TemporaryDirectory() as tmp:
             camera_risk.write_session(trace(20), Path(tmp), start_ms=10_000)
@@ -35,6 +48,48 @@ class CameraRiskTest(unittest.TestCase):
         self.assertEqual(len(timeline), len(frames))
         self.assertIn('face_jawOpen', timeline)
         self.assertIn('posture_head_tilt_degrees', timeline)
+
+    def test_multimodal_trace_reaches_model_and_camera_only_masks_missing_inputs(self):
+        from unittest.mock import patch
+        camera_risk._import_model(FUSION_REPO)
+        from training.inference_xgb_suspicious import load_model
+        from bank24_inputs import encode_keyboard
+        embedding = encode_keyboard([66] * 16, [[3, 4, 2, 1, 0, 0, 0, 0]] * 16)
+        self.assertEqual(len(embedding), 128)
+        full = trace(60)
+        full['started_epoch_ms'] = 1000000
+        full['telemetry'] = []
+        def event(kind, t, **values):
+            full['telemetry'].append(dict(type=kind, page_anchor_ms=1000000, time_ms=t,
+                                          field='title', **values))
+        event('environment', 0, env=dict(platform='test', screen=dict(width=1920, height=1080)))
+        for t in range(0, 60000, 50):
+            event('pointer', t, x=(t % 1000) / 1000, y=0.5, width=1920, height=1080)
+        for t in range(0, 60000, 5000):
+            event('ping', t, duration_ms=20)
+            event('server_request', t, duration_ms=15, status=200)
+            event('input', t)
+            event('keyboard_embedding', t + 4000, duration_ms=3000, length=16, embedding=embedding)
+        profile = camera_risk.build_enrollment_sample(full, 'p', FUSION_REPO)
+        self.assertTrue(profile.kb_mask)
+        self.assertTrue(profile.mouse_mask)
+        self.assertTrue(profile.device)
+        predictor = load_model()
+        batches = []
+        handle = predictor.model.register_forward_pre_hook(lambda model, args: batches.append(args[0]))
+        try:
+            result = camera_risk.assess_camera(full, 'p', FUSION_REPO, profile)
+            self.assertTrue({'keyboard', 'mouse', 'context', 'network', 'device'} <= set(result['available_signals']))
+            self.assertTrue(batches[-1]['net_mask'].any())
+            self.assertTrue(batches[-1]['mask'][:, 0].any())
+            with patch.object(predictor.network_model, 'predict_proba', side_effect=AssertionError('Missing network must not be classified')):
+                camera_only = camera_risk.assess_camera(trace(40), 'p', FUSION_REPO, profile)
+            self.assertEqual(set(camera_only['available_signals']), {'camera_pulse', 'camera_face'})
+            self.assertFalse(batches[-1]['net_mask'].any())
+            self.assertFalse(batches[-1]['mask'][:, 4].any())
+            self.assertFalse(batches[-1]['ctx'].any())
+        finally:
+            handle.remove()
 
     def test_posture_metrics(self):
         pose = [dict(x=0.5, y=0.5, visibility=1.0)] * 13

@@ -10,7 +10,7 @@ const TIMER_SECONDS: Partial<Record<string, number>> = { intruder: 90, scam: 120
 const CHAT_DELAY_MS = 2500;
 
 function money(n: number) {
-  return n.toLocaleString("pl-PL", { style: "currency", currency: "PLN" });
+  return n.toLocaleString("en-GB", { style: "currency", currency: "PLN" });
 }
 
 function digitsOnly(s: string) {
@@ -66,14 +66,14 @@ export function BankApp() {
     if (condition === "dictation") {
       const inv = acc.invoice;
       return [
-        { delayMs: 800, text: "Cześć, tu Ania z księgowości :)" },
-        { delayMs: 2500, text: `Mam fakturę od ${inv.issuer}, trzeba ją dziś opłacić. Podeślę Ci dane, wpisz je w nowy przelew.` },
-        { delayMs: 3000, text: `Odbiorca: ${inv.name}` },
+        { delayMs: 800, text: "Hi, this is Anna from accounting :)" },
+        { delayMs: 2500, text: `I have an invoice from ${inv.issuer} that needs paying today. I will send you the details; enter them into a new transfer.` },
+        { delayMs: 3000, text: `Recipient: ${inv.name}` },
         { delayMs: 2500, text: `Nr konta: ${inv.nrb_display}` },
-        { delayMs: 2500, text: `Kwota: ${money(inv.amount)}` },
-        { delayMs: 2000, text: `Tytuł: ${inv.title}` },
-        { delayMs: 2000, text: "Daj znać, jak puścisz przelew.", awaitReplyMs: 120_000 },
-        { delayMs: 1500, text: "Super, dzięki!" },
+        { delayMs: 2500, text: `Amount: ${money(inv.amount)}` },
+        { delayMs: 2000, text: `Reference: ${inv.title}` },
+        { delayMs: 2000, text: "Let me know when you send the transfer.", awaitReplyMs: 120_000 },
+        { delayMs: 1500, text: "Great, thanks!" },
       ];
     }
     if (condition === "scam") {
@@ -82,21 +82,21 @@ export function BankApp() {
       const tech2 = tech.slice(0, 22) + tech.slice(22).split("").reverse().join("");
       const amount = Math.floor(acc.balance);
       return [
-        { delayMs: 500, kind: "alert", text: "⚠ Wykryto nietypowe logowanie do Twojego konta (Android · Lagos, Nigeria). Konsultant bezpieczeństwa dołączył do czatu." },
-        { delayMs: 2000, text: "Dzień dobry, Marek Wiśniewski, Dział Bezpieczeństwa Bank24. Widzimy aktywną próbę wyprowadzenia środków z Pana/Pani konta." },
-        { delayMs: 2500, text: "Czy jest Pan/Pani teraz przy komputerze? Proszę odpisać.", awaitReplyMs: 20_000 },
-        { delayMs: 1500, text: "Dziękuję. Proszę się NIE wylogowywać, to przerwie procedurę zabezpieczenia." },
-        { delayMs: 2500, text: "Środki trzeba natychmiast przenieść na rachunek techniczny banku. To standardowa procedura, pieniądze wrócą na konto w ciągu 24 h." },
-        { delayMs: 2500, text: "Odbiorca: Rachunek techniczny Bank24" },
-        { delayMs: 2000, text: `Numer: ${formatNrbInput(tech)}` },
-        { delayMs: 2000, text: `Kwota: ${money(amount)} – całe saldo, inaczej przestępca zdąży przed nami.` },
-        { delayMs: 4000, kind: "alert", text: "⚠ Nieudana próba autoryzacji przelewu z urządzenia: Android · Lagos" },
-        { delayMs: 3000, text: "Uwaga, poprawka! Poprzedni rachunek został właśnie przejęty. Proszę użyć NOWEGO numeru:" },
-        { delayMs: 1500, text: `Numer: ${formatNrbInput(tech2)}` },
-        { delayMs: 2000, text: "Tytuł: ZABEZPIECZENIE SRODKOW 4471" },
-        { delayMs: 3000, text: "Za chwilę dostanie Pan/Pani SMS z kodem. Proszę przepisać kod TUTAJ na czacie, muszę zweryfikować operację po naszej stronie.", awaitReplyMs: 40_000 },
-        { delayMs: 2000, text: "Proszę się pospieszyć, system zablokuje konto za kilka chwil." },
-        { delayMs: 15_000, text: "Halo? Jest Pan/Pani? Każda sekunda się liczy." },
+        { delayMs: 500, kind: "alert", text: "⚠ Unusual sign-in detected on your account (Android · Lagos, Nigeria). A security consultant has joined the chat." },
+        { delayMs: 2000, text: "Hello, Marek Wisniewski, Bank24 Security Department. We can see an active attempt to move funds out of your account." },
+        { delayMs: 2500, text: "Are you at your computer right now? Please reply.", awaitReplyMs: 20_000 },
+        { delayMs: 1500, text: "Thank you. Please do NOT sign out; that would interrupt the security procedure." },
+        { delayMs: 2500, text: "The funds must be moved to the bank's technical account immediately. This is standard procedure; the money will return within 24 hours." },
+        { delayMs: 2500, text: "Recipient: Bank24 technical account" },
+        { delayMs: 2000, text: `Number: ${formatNrbInput(tech)}` },
+        { delayMs: 2000, text: `Amount: ${money(amount)} – the entire balance, otherwise the criminal will get there first.` },
+        { delayMs: 4000, kind: "alert", text: "⚠ Failed transfer authorization attempt from device: Android · Lagos" },
+        { delayMs: 3000, text: "Correction! The previous account was just compromised. Please use the NEW number:" },
+        { delayMs: 1500, text: `Number: ${formatNrbInput(tech2)}` },
+        { delayMs: 2000, text: "Reference: FUNDS PROTECTION 4471" },
+        { delayMs: 3000, text: "You will receive an SMS code shortly. Please type it HERE in the chat; I need to verify the transaction on our side.", awaitReplyMs: 40_000 },
+        { delayMs: 2000, text: "Please hurry, the system will lock your account shortly." },
+        { delayMs: 15_000, text: "Hello? Are you there? Every second counts." },
       ];
     }
     return null;
@@ -205,7 +205,7 @@ export function BankApp() {
 
   const submitId = () => {
     if (clientId.trim().toLowerCase() !== acc.client_id) {
-      setLoginErr("Nie rozpoznajemy tego identyfikatora.");
+      setLoginErr("We do not recognize this identifier.");
       return;
     }
     setLoginErr(null);
@@ -214,7 +214,7 @@ export function BankApp() {
 
   const submitPassword = () => {
     if (password.trim().toLowerCase() !== acc.password) {
-      setLoginErr("Hasło nieprawidłowe. Spróbuj ponownie.");
+      setLoginErr("Incorrect password. Try again.");
       return;
     }
     setLoginErr(null);
@@ -226,7 +226,7 @@ export function BankApp() {
 
   const confirm = () => {
     if (code.trim() !== acc.sms_code) {
-      setConfirmErr("Nieprawidłowy kod. Sprawdź SMS.");
+      setConfirmErr("Incorrect code. Check the SMS.");
       return;
     }
     setBalance((b) => b - parseAmount(amount));
@@ -257,12 +257,12 @@ export function BankApp() {
     if (condition === "intruder") {
       return (
         <div className="card">
-          <h3>Twoja kartka</h3>
-          <p className="tiny">Konto „słupa”, na które wyprowadzasz pieniądze. Przepisz numer ręcznie.</p>
+          <h3>Your reference card</h3>
+          <p className="tiny">The mule account to which you transfer money. Copy the number manually.</p>
           <div className="invoice">
-            <div>Odbiorca: {identity?.full_name}</div>
-            <div className="nrb">Konto: {identity?.nrb_display}</div>
-            <div>Kwota: ile się da</div>
+            <div>Recipient: {identity?.full_name}</div>
+            <div className="nrb">Account: {identity?.nrb_display}</div>
+            <div>Amount: as much as possible</div>
           </div>
         </div>
       );
@@ -270,40 +270,40 @@ export function BankApp() {
     if (condition === "dictation") {
       return (
         <div className="card">
-          <h3>Przelew dla księgowości</h3>
-          <p className="muted">Dane do przelewu przyśle Ci księgowa na czacie obok.</p>
+          <h3>Transfer for accounting</h3>
+          <p className="muted">The accountant will send transfer details in the chat beside this page.</p>
         </div>
       );
     }
     if (condition === "scam") {
       return (
         <div className="card">
-          <h3>Ostatnie operacje</h3>
+          <h3>Recent transactions</h3>
           <div className="tx">
             <span>Biedronka Kraków</span>
-            <span>-84,20 zł</span>
+            <span>-PLN 84.20</span>
           </div>
           <div className="tx">
-            <span>Wynagrodzenie</span>
-            <span>+5 420,00 zł</span>
+            <span>Salary</span>
+            <span>+PLN 5,420.00</span>
           </div>
           <div className="tx">
             <span>Netflix</span>
-            <span>-43,00 zł</span>
+            <span>-PLN 43.00</span>
           </div>
         </div>
       );
     }
     return (
       <div className="card">
-        <h3>Faktura do opłacenia</h3>
-        <p className="tiny">Przepisz dane do formularza przelewu.</p>
+        <h3>Invoice to pay</h3>
+        <p className="tiny">Copy the details into the transfer form.</p>
         <div className="invoice">
           <div>{acc.invoice.issuer}</div>
-          <div>Odbiorca: {acc.invoice.name}</div>
-          <div className="nrb">Konto: {acc.invoice.nrb_display}</div>
-          <div>Kwota: {money(acc.invoice.amount)}</div>
-          <div>Tytuł: {acc.invoice.title}</div>
+          <div>Recipient: {acc.invoice.name}</div>
+          <div className="nrb">Account: {acc.invoice.nrb_display}</div>
+          <div>Amount: {money(acc.invoice.amount)}</div>
+          <div>Reference: {acc.invoice.title}</div>
         </div>
       </div>
     );
@@ -317,39 +317,39 @@ export function BankApp() {
           Bank24
         </div>
         <nav>
-          <a>Konta</a>
-          <a>Przelewy</a>
-          <a>Historia</a>
+          <a>Accounts</a>
+          <a>Transfers</a>
+          <a>History</a>
         </nav>
-        <span className="research-flag">strona badawcza</span>
+        <span className="research-flag">research page</span>
       </header>
 
       {secondsLeft !== null && loggedIn && phase !== "success" && (
         <div className={`banner ${condition === "scam" ? "" : "warn"}`}>
           <span>
-            {condition === "scam" ? "Konto zostanie zablokowane za" : "Właściciel może wrócić za"} {secondsLeft} s
+            {condition === "scam" ? "Account will be locked in" : "Owner may return in"} {secondsLeft} s
           </span>
-          <span>Saldo: {money(balance)}</span>
+          <span>Balance: {money(balance)}</span>
         </div>
       )}
 
       {!loggedIn && (
         <div className="login-wrap">
           <div className="login-hero">
-            <h2>Witamy w bankowości internetowej</h2>
-            <p>Zaloguj się identyfikatorem, a następnie hasłem.</p>
-            <p className="tiny">To nie jest prawdziwy bank. Nie wpisuj danych z Pekao, mBanku ani ING.</p>
+            <h2>Welcome to online banking</h2>
+            <p>Sign in with your client ID, then your password.</p>
+            <p className="tiny">This is not a real bank. Do not enter credentials from your real bank.</p>
           </div>
           <div className="login-panel">
             <div className="login-box">
-              <h1>{phase === "id" ? "Zaloguj się do Bank24" : "Hasło"}</h1>
+              <h1>{phase === "id" ? "Sign in to Bank24" : "Password"}</h1>
               <p className="sub">
-                {phase === "id" ? "Podaj identyfikator klienta" : `Witaj, ${acc.first_name}. Wpisz hasło.`}
+                {phase === "id" ? "Enter your client ID" : `Welcome, ${acc.first_name}. Enter password.`}
               </p>
               {phase === "id" ? (
                 <>
                   <div className="field">
-                    <label htmlFor="client_id">Identyfikator</label>
+                    <label htmlFor="client_id">ID</label>
                     <input
                       id="client_id"
                       data-field="client_id"
@@ -362,13 +362,13 @@ export function BankApp() {
                   </div>
                   {loginErr && <p className="error">{loginErr}</p>}
                   <button className="btn" data-field="submit" onClick={submitId}>
-                    Dalej
+                    Continue
                   </button>
                 </>
               ) : (
                 <>
                   <div className="field">
-                    <label htmlFor="password">Hasło</label>
+                    <label htmlFor="password">Password</label>
                     <input
                       id="password"
                       data-field="password"
@@ -383,17 +383,17 @@ export function BankApp() {
                   {loginErr && <p className="error">{loginErr}</p>}
                   <div className="row">
                     <button className="btn secondary" onClick={() => setPhase("id")}>
-                      Wstecz
+                      Back
                     </button>
                     <button className="btn" data-field="submit" onClick={submitPassword}>
-                      Zaloguj
+                      Sign in
                     </button>
                   </div>
                 </>
               )}
               <div className="links">
-                <span className="tiny">Pierwszy raz w Bank24</span>
-                <span className="tiny">Nie pamiętasz hasła?</span>
+                <span className="tiny">New to Bank24</span>
+                <span className="tiny">Forgot your password?</span>
               </div>
             </div>
           </div>
@@ -402,20 +402,20 @@ export function BankApp() {
 
       {phase === "dash" && (
         <div className="dash">
-          <p className="muted">Zalogowano jako {acc.full_name}</p>
+          <p className="muted">Signed in as {acc.full_name}</p>
           <div className="dash-grid">
             <div className="card">
-              <div className="muted">Rachunek bieżący</div>
+              <div className="muted">Current account</div>
               <div className="nrb">{acc.nrb_display}</div>
               <div className="balance">{money(balance)}</div>
-              <div className="muted">Dostępne środki</div>
+              <div className="muted">Available funds</div>
               <div className="row" style={{ marginTop: 16 }}>
                 <button
                   className="btn accent"
                   data-field="open_transfer"
                   onClick={() => goStage("dashboard", "transfer", "transfer")}
                 >
-                  Nowy przelew
+                  New transfer
                 </button>
               </div>
             </div>
@@ -429,14 +429,14 @@ export function BankApp() {
           <div className="dash-grid">
             <div className="card">
               <div className="steps">
-                <span className="on">1. Dane</span>
-                <span>2. Potwierdzenie</span>
-                <span>3. Koniec</span>
+                <span className="on">1. Details</span>
+                <span>2. Confirmation</span>
+                <span>3. Finish</span>
               </div>
-              <h2>Przelew zwykły</h2>
-              <p className="muted">Z rachunku {acc.nrb_display} · dostępne {money(balance)}</p>
+              <h2>Standard transfer</h2>
+              <p className="muted">From account {acc.nrb_display} · available {money(balance)}</p>
               <div className="field">
-                <label htmlFor="payee">Nazwa odbiorcy</label>
+                <label htmlFor="payee">Recipient name</label>
                 <input
                   id="payee"
                   data-field="payee"
@@ -446,7 +446,7 @@ export function BankApp() {
                 />
               </div>
               <div className="field">
-                <label htmlFor="nrb">Numer rachunku (26 cyfr)</label>
+                <label htmlFor="nrb">Account number (26 digits)</label>
                 <input
                   id="nrb"
                   data-field="nrb"
@@ -456,10 +456,10 @@ export function BankApp() {
                   onChange={(e) => setNrb(formatNrbInput(e.target.value))}
                   inputMode="numeric"
                 />
-                <span className="tiny">{digitsOnly(nrb).length} / 26 cyfr</span>
+                <span className="tiny">{digitsOnly(nrb).length} / 26 digits</span>
               </div>
               <div className="field">
-                <label htmlFor="amount">Kwota (PLN)</label>
+                <label htmlFor="amount">Amount (PLN)</label>
                 <input
                   id="amount"
                   data-field="amount"
@@ -470,7 +470,7 @@ export function BankApp() {
                 />
               </div>
               <div className="field">
-                <label htmlFor="title">Tytuł</label>
+                <label htmlFor="title">Reference</label>
                 <input
                   id="title"
                   data-field="title"
@@ -481,7 +481,7 @@ export function BankApp() {
               </div>
               <div className="row">
                 <button className="btn secondary" onClick={() => goStage("transfer", "dashboard", "dash")}>
-                  Anuluj
+                  Cancel
                 </button>
                 <button
                   className="btn"
@@ -489,7 +489,7 @@ export function BankApp() {
                   onClick={submitTransferData}
                   disabled={digitsOnly(nrb).length !== 26 || !payee.trim() || parseAmount(amount) <= 0}
                 >
-                  Dalej
+                  Continue
                 </button>
               </div>
             </div>
@@ -502,18 +502,18 @@ export function BankApp() {
         <div className="dash transfer-form">
           <div className="card risk-card">
             <div className="steps">
-              <span>1. Dane</span>
-              <span className="on">2. Ocena ryzyka</span>
-              <span>3. Potwierdzenie</span>
-              <span>4. Koniec</span>
+              <span>1. Details</span>
+              <span className="on">2. Risk assessment</span>
+              <span>3. Confirmation</span>
+              <span>4. Finish</span>
             </div>
-            <h2>Ocena ryzyka przelewu</h2>
-            <p className="muted">Wynik na podstawie nagrania z kamery i telemetrii wpisywania danych.</p>
+            <h2>Transfer risk assessment</h2>
+            <p className="muted">Result based on camera recording and typing telemetry.</p>
             <div className="risk-score">{risk?.score ?? 0}<span>/100</span></div>
-            {riskLoading && <p className="tiny">Aktualizacja wyniku…</p>}
+            {riskLoading && <p className="tiny">Updating result…</p>}
             <div className="row">
-              <button className="btn secondary" onClick={() => goStage("risk", "transfer", "transfer")}>Edytuj dane</button>
-              <button className="btn" onClick={() => goStage("risk", "confirm", "confirm")}>Dalej</button>
+              <button className="btn secondary" onClick={() => goStage("risk", "transfer", "transfer")}>Edit details</button>
+              <button className="btn" onClick={() => goStage("risk", "confirm", "confirm")}>Continue</button>
             </div>
           </div>
         </div>
@@ -522,22 +522,21 @@ export function BankApp() {
       {phase === "confirm" && (
         <div className="dash transfer-form">
           <div className="card">
-            <h2>Potwierdź kodem SMS</h2>
+            <h2>Confirm with SMS code</h2>
             <p>
               {payee} · <span className="nrb">{nrb}</span> · {money(parseAmount(amount))}
             </p>
             {condition === "intruder" ? (
-              <p className="tiny">Kod jest na kartce z wycieku.</p>
+              <p className="tiny">The code is on the leaked-credentials card.</p>
             ) : condition === "scam" ? (
               <p className="invoice">
-                SMS od Bank24: Kod {acc.sms_code} do przelewu {money(parseAmount(amount))}. Nigdy nie podawaj tego kodu
-                nikomu, także pracownikom banku.
+                SMS from Bank24: Code {acc.sms_code} for transfer of {money(parseAmount(amount))}. Never share this code with anyone, including bank staff.
               </p>
             ) : (
-              <p className="invoice">SMS od Bank24: Twój kod do przelewu to {acc.sms_code}</p>
+              <p className="invoice">SMS from Bank24: Your transfer code is {acc.sms_code}</p>
             )}
             <div className="field">
-              <label htmlFor="sms_code">Kod z SMS</label>
+              <label htmlFor="sms_code">SMS code</label>
               <input
                 id="sms_code"
                 data-field="sms_code"
@@ -551,10 +550,10 @@ export function BankApp() {
             {confirmErr && <p className="error">{confirmErr}</p>}
             <div className="row">
               <button className="btn secondary" onClick={() => goStage("confirm", "transfer", "transfer")}>
-                Wstecz
+                Back
               </button>
               <button className="btn" data-field="confirm" onClick={confirm}>
-                Zatwierdź przelew
+                Approve transfer
               </button>
             </div>
           </div>
@@ -564,31 +563,31 @@ export function BankApp() {
       {phase === "success" && (
         <div className="dash">
           <div className="card">
-            <h2 className="ok">Przelew przyjęty</h2>
+            <h2 className="ok">Transfer accepted</h2>
             <p>
               {money(parseAmount(amount))} do {payee}
             </p>
             <p className="nrb">{nrb}</p>
             <button className="btn" onClick={wrapUp}>
-              Zakończ sesję
+              Finish session
             </button>
           </div>
         </div>
       )}
 
-      <p className="footer-note">Bank24 (strona badawcza) — to nie jest prawdziwy bank.</p>
+      <p className="footer-note">Bank24 (research page) — this is not a real bank.</p>
 
       {showLeak && victim && (
         <div className="overlay">
           <div className="leak">
-            <div className="hdr">Telegram · wyciek_bank24.txt</div>
+            <div className="hdr">Telegram · bank24_leak.txt</div>
             <div>login: {victim.identity.client_id}</div>
-            <div>haslo: {victim.identity.password}</div>
+            <div>password: {victim.identity.password}</div>
             <div>sms: {victim.identity.sms_code}</div>
             <div>imie: {victim.identity.full_name}</div>
-            <p className="tiny">Kartka zniknie za kilka sekund. Zapamiętaj dane.</p>
+            <p className="tiny">The card will disappear in a few seconds. Remember the details.</p>
             <button className="btn secondary" style={{ marginTop: 8 }} onClick={() => setShowLeak(false)}>
-              Zapamiętałem
+              I have memorized it
             </button>
           </div>
         </div>
@@ -604,13 +603,13 @@ export function BankApp() {
             window.setTimeout(() => setPeekLeak(false), 2000);
           }}
         >
-          Zerknij na kartkę
+          Peek at the card
         </button>
       )}
       {peekLeak && victim && (
         <div className="leak" style={{ position: "fixed", left: 12, top: 120, zIndex: 35 }}>
           <div>login: {victim.identity.client_id}</div>
-          <div>haslo: {victim.identity.password}</div>
+          <div>password: {victim.identity.password}</div>
           <div>sms: {victim.identity.sms_code}</div>
         </div>
       )}
@@ -618,8 +617,8 @@ export function BankApp() {
       {deviceAlert && (
         <div className="overlay">
           <div className="modal">
-            <h3>Wykryliśmy logowanie z nowego urządzenia</h3>
-            <p>Potwierdź tożsamość właściciela konta. Podaj datę urodzenia (RRRR-MM-DD).</p>
+            <h3>We detected a sign-in from a new device</h3>
+            <p>Verify the account owner identity. Enter the date of birth (YYYY-MM-DD).</p>
             <input
               data-field="birth_date"
               autoComplete="off"
@@ -628,10 +627,10 @@ export function BankApp() {
             />
             <div className="row" style={{ marginTop: 12 }}>
               <button className="btn" onClick={() => setDeviceAlert(false)}>
-                Potwierdź
+                Confirm
               </button>
               <button className="btn secondary" onClick={() => setDeviceAlert(false)}>
-                Pomiń
+                Skip
               </button>
             </div>
           </div>
@@ -640,8 +639,8 @@ export function BankApp() {
 
       {chatOn && chatSteps && (
         <ChatPanel
-          title={condition === "scam" ? "Pomoc techniczna Bank24" : "Anna Nowak · Księgowość"}
-          subtitle={condition === "scam" ? "Czat na żywo · konsultant online" : "Teams · dostępna"}
+          title={condition === "scam" ? "Bank24 technical support" : "Anna Nowak · Accounting"}
+          subtitle={condition === "scam" ? "Live chat · consultant online" : "Teams · available"}
           variant={condition === "scam" ? "support" : "work"}
           steps={chatSteps}
           runId={chatRun}

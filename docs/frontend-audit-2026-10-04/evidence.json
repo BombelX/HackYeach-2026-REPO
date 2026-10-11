@@ -9,7 +9,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Witaj w Bank24",
+          "text": "Welcome to Bank24",
           "tabindex": "-1"
         }
       ],
@@ -34,7 +34,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Zasady udziału",
+          "text": "Participation terms",
           "tabindex": "-1"
         }
       ],
@@ -57,7 +57,7 @@
           "height": 20
         },
         {
-          "text": "Wróć",
+          "text": "Back",
           "tag": "A",
           "width": 38,
           "height": 44
@@ -78,11 +78,11 @@
       "height": 1129,
       "headings": [
         {
-          "text": "Twoje finansesą u nas bezpieczne",
+          "text": "Your finances are safe with us",
           "tabindex": null
         },
         {
-          "text": "Zaloguj się do Bank24",
+          "text": "Sign in to Bank24",
           "tabindex": "-1"
         }
       ],
@@ -114,7 +114,7 @@
       "height": 1209,
       "headings": [
         {
-          "text": "Wpisz kod logowania",
+          "text": "Enter the sign-in code",
           "tabindex": "-1"
         }
       ],
@@ -139,7 +139,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Dzień dobry, Anno",
+          "text": "Hello, Anna",
           "tabindex": null
         }
       ],
@@ -164,7 +164,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Historia operacji",
+          "text": "Transaction history",
           "tabindex": "-1"
         }
       ],
@@ -185,19 +185,19 @@
     "filters": [
       {
         "tag": "SPAN",
-        "text": "Wszystkie",
+        "text": "All",
         "role": null,
         "tabIndex": -1
       },
       {
         "tag": "SPAN",
-        "text": "Wpływy",
+        "text": "Income",
         "role": null,
         "tabIndex": -1
       },
       {
         "tag": "SPAN",
-        "text": "Wydatki",
+        "text": "Spending",
         "role": null,
         "tabIndex": -1
       }
@@ -213,7 +213,7 @@
       "height": 1244,
       "headings": [
         {
-          "text": "Nowy przelew",
+          "text": "New transfer",
           "tabindex": "-1"
         }
       ],
@@ -238,7 +238,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Weryfikacja bezpieczeństwa",
+          "text": "Security verification",
           "tabindex": "-1"
         }
       ],
@@ -263,7 +263,7 @@
       "height": 1018,
       "headings": [
         {
-          "text": "Zachowaj kontrolę nad przelewem",
+          "text": "Stay in control of your transfer",
           "tabindex": "-1"
         }
       ],
@@ -307,7 +307,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Potwierdź przelew",
+          "text": "Confirm transfer",
           "tabindex": "-1"
         }
       ],
@@ -332,7 +332,7 @@
       "height": 1000,
       "headings": [
         {
-          "text": "Przelew zrealizowany",
+          "text": "Transfer completed",
           "tabindex": "-1"
         }
       ],
@@ -357,7 +357,7 @@
       "height": 1119,
       "headings": [
         {
-          "text": "Centrum pomocy",
+          "text": "Help center",
           "tabindex": "-1"
         }
       ],
@@ -382,7 +382,7 @@
       "height": 894,
       "headings": [
         {
-          "text": "Witaj w Bank24",
+          "text": "Welcome to Bank24",
           "tabindex": "-1"
         }
       ],
@@ -393,7 +393,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -414,7 +414,7 @@
       "height": 1229,
       "headings": [
         {
-          "text": "Zasady udziału",
+          "text": "Participation terms",
           "tabindex": "-1"
         }
       ],
@@ -425,7 +425,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -443,7 +443,7 @@
           "height": 20
         },
         {
-          "text": "Wróć",
+          "text": "Back",
           "tag": "A",
           "width": 38,
           "height": 44
@@ -464,11 +464,11 @@
       "height": 1223,
       "headings": [
         {
-          "text": "Twoje finansesą u nas bezpieczne",
+          "text": "Your finances are safe with us",
           "tabindex": null
         },
         {
-          "text": "Zaloguj się do Bank24",
+          "text": "Sign in to Bank24",
           "tabindex": "-1"
         }
       ],
@@ -479,7 +479,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -506,7 +506,7 @@
       "height": 1589,
       "headings": [
         {
-          "text": "Wpisz kod logowania",
+          "text": "Enter the sign-in code",
           "tabindex": "-1"
         }
       ],
@@ -517,7 +517,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -538,7 +538,7 @@
       "height": 1899,
       "headings": [
         {
-          "text": "Dzień dobry, Anno",
+          "text": "Hello, Anna",
           "tabindex": null
         }
       ],
@@ -549,7 +549,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -570,7 +570,7 @@
       "height": 1198,
       "headings": [
         {
-          "text": "Historia operacji",
+          "text": "Transaction history",
           "tabindex": "-1"
         }
       ],
@@ -581,7 +581,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -612,19 +612,19 @@
     "filters": [
       {
         "tag": "SPAN",
-        "text": "Wszystkie",
+        "text": "All",
         "role": null,
         "tabIndex": -1
       },
       {
         "tag": "SPAN",
-        "text": "Wpływy",
+        "text": "Income",
         "role": null,
         "tabIndex": -1
       },
       {
         "tag": "SPAN",
-        "text": "Wydatki",
+        "text": "Spending",
         "role": null,
         "tabIndex": -1
       }
@@ -640,7 +640,7 @@
       "height": 3160,
       "headings": [
         {
-          "text": "Nowy przelew",
+          "text": "New transfer",
           "tabindex": "-1"
         }
       ],
@@ -651,7 +651,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -672,7 +672,7 @@
       "height": 1350,
       "headings": [
         {
-          "text": "Weryfikacja bezpieczeństwa",
+          "text": "Security verification",
           "tabindex": "-1"
         }
       ],
@@ -683,7 +683,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -704,7 +704,7 @@
       "height": 1501,
       "headings": [
         {
-          "text": "Zachowaj kontrolę nad przelewem",
+          "text": "Stay in control of your transfer",
           "tabindex": "-1"
         }
       ],
@@ -715,7 +715,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -754,7 +754,7 @@
       "height": 1064,
       "headings": [
         {
-          "text": "Potwierdź przelew",
+          "text": "Confirm transfer",
           "tabindex": "-1"
         }
       ],
@@ -765,7 +765,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -786,7 +786,7 @@
       "height": 1232,
       "headings": [
         {
-          "text": "Przelew zrealizowany",
+          "text": "Transfer completed",
           "tabindex": "-1"
         }
       ],
@@ -797,7 +797,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
@@ -818,7 +818,7 @@
       "height": 1260,
       "headings": [
         {
-          "text": "Centrum pomocy",
+          "text": "Help center",
           "tabindex": "-1"
         }
       ],
@@ -829,7 +829,7 @@
       },
       "smallTargets": [
         {
-          "text": "Pomoc",
+          "text": "Help",
           "tag": "A",
           "width": 20,
           "height": 44
