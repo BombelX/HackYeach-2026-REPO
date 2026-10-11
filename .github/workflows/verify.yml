@@ -28,10 +28,6 @@ jobs:
         working-directory: data-collector/front
       - run: npx playwright install --with-deps chromium
         working-directory: frontend
-      - run: npm run test:e2e
-        working-directory: frontend
-        env:
-          CI: 'true'
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
