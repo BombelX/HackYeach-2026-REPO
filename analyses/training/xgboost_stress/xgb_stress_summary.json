@@ -1,0 +1,114 @@
+{
+  "all_thresholds": {
+    "2": {
+      "accuracy": 1.0,
+      "auprc": 1.0,
+      "f1": 1.0,
+      "positive_rate": 0.84,
+      "precision": 1.0,
+      "recall": 1.0,
+      "roc_auc": 1.0,
+      "threshold": 2
+    },
+    "3": {
+      "accuracy": 0.96,
+      "auprc": 1.0,
+      "f1": 0.9629629629629629,
+      "positive_rate": 0.56,
+      "precision": 1.0,
+      "recall": 0.9285714285714286,
+      "roc_auc": 1.0,
+      "threshold": 3
+    },
+    "4": {
+      "accuracy": 1.0,
+      "auprc": 1.0,
+      "f1": 1.0,
+      "positive_rate": 0.36,
+      "precision": 1.0,
+      "recall": 1.0,
+      "roc_auc": 1.0,
+      "threshold": 4
+    },
+    "5": {
+      "accuracy": 0.88,
+      "auprc": 0.9999999999999998,
+      "f1": 0.7272727272727273,
+      "positive_rate": 0.28,
+      "precision": 1.0,
+      "recall": 0.5714285714285714,
+      "roc_auc": 1.0,
+      "threshold": 5
+    },
+    "6": {
+      "accuracy": 0.92,
+      "auprc": 1.0,
+      "f1": 0.0,
+      "positive_rate": 0.08,
+      "precision": 0.0,
+      "recall": 0.0,
+      "roc_auc": 1.0,
+      "threshold": 6
+    }
+  },
+  "best_threshold": 2,
+  "dataset": {
+    "test_participants": [
+      "P-00163GW",
+      "P-0017M2F",
+      "P-00408N3",
+      "P-0050Q5J",
+      "P-0052T8N",
+      "P-0103S7M",
+      "P-0107YDT",
+      "P-0112Q5J"
+    ],
+    "train_participants": [
+      "P-00274HX",
+      "P-0028N3G",
+      "P-0031AQ5",
+      "P-0032U9P",
+      "P-0044EU9",
+      "P-0045YDT",
+      "P-0046HXC",
+      "P-00584HX",
+      "P-0061R6K",
+      "P-00718N3",
+      "P-0074VAQ",
+      "P-0085WBR",
+      "P-0086FVA",
+      "P-0087ZEU",
+      "P-00917M2",
+      "P-0092R6K",
+      "P-0095DT8",
+      "P-0096XCS",
+      "P-00982FV",
+      "P-0099KZE",
+      "P-0101P4H",
+      "P-0106EU9",
+      "P-0108HXC",
+      "P-0110M2F",
+      "P-0116WBR"
+    ],
+    "val_participants": [
+      "P-0015HXC",
+      "P-0026JYD",
+      "P-0048M2F",
+      "P-0056ZEU",
+      "P-00607M2",
+      "P-00672FV",
+      "P-00829P4",
+      "P-0105VAQ"
+    ]
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "auprc": 1.0,
+    "f1": 1.0,
+    "positive_rate": 0.84,
+    "precision": 1.0,
+    "recall": 1.0,
+    "roc_auc": 1.0,
+    "threshold": 2
+  }
+}

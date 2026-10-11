@@ -1,0 +1,91 @@
+{
+  "source": "GUID\u00c6TA mouse_session_features.parquet",
+  "features": [
+    "dur_s",
+    "path_len",
+    "straightness",
+    "speed_med",
+    "speed_std",
+    "speed_roll_std_med",
+    "speed_minus_roll_med",
+    "accel_med",
+    "turn_med",
+    "idle_frac",
+    "n_clicks",
+    "click_rate",
+    "n_scroll",
+    "n_strokes",
+    "stroke_len_med",
+    "speed_entropy",
+    "time_to_first_move",
+    "path_per_sec",
+    "speed_cv",
+    "clicks_per_stroke"
+  ],
+  "center": [
+    31.266000032424927,
+    2.3105378592615424,
+    0.14553801890508966,
+    0.12254930835074684,
+    0.5594175688179632,
+    0.07534394483636175,
+    -0.005277719350409518,
+    3.235053410207019,
+    0.09290544578336729,
+    0.30396412988664523,
+    2.5,
+    0.07473291170427661,
+    20.0,
+    19.0,
+    0.0020035167904279426,
+    1.8283626997573952,
+    0.01699995994567871,
+    0.08908310680355663,
+    4.441013117807773,
+    0.13043478260869565
+  ],
+  "scale": [
+    63.22450006008148,
+    3.753942954482013,
+    0.2352513252093913,
+    0.12765241450539222,
+    0.347098924599426,
+    0.07522380805765376,
+    0.011385496340901257,
+    3.0112567825051455,
+    0.10142034019433979,
+    0.260630289370143,
+    6.0,
+    0.16456346130330185,
+    101.0,
+    36.0,
+    0.002145409678938447,
+    0.4526920710982232,
+    0.024000167846679688,
+    0.10652410283555169,
+    6.060397615137076,
+    0.24612262521588946
+  ],
+  "profile": "median of task-1 raw features; pair = abs(clip(probe) - clip(profile))",
+  "model_choices": {
+    "catboost": {
+      "choice": 2,
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 20,
+        "learning_rate": 0.02,
+        "iterations": 900
+      }
+    },
+    "xgboost": {
+      "choice": 0,
+      "params": {
+        "max_depth": 2,
+        "min_child_weight": 10,
+        "learning_rate": 0.03,
+        "n_estimators": 500
+      }
+    }
+  },
+  "evaluation": "comparison.json (disjoint-user CV, not full fit)"
+}

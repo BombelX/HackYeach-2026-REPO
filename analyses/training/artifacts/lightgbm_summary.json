@@ -1,0 +1,142 @@
+{
+  "binary": {
+    "0": {
+      "accuracy": 0.5555555555555556,
+      "auc": 1.0,
+      "confusion_matrix": [
+        [
+          10,
+          0
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "f1": 0.0,
+      "logloss": 0.6432871866513397,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "1": {
+      "accuracy": 0.5555555555555556,
+      "auc": 1.0,
+      "confusion_matrix": [
+        [
+          10,
+          0
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "f1": 0.0,
+      "logloss": 0.6432871866513397,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "2": {
+      "accuracy": 0.5555555555555556,
+      "auc": 1.0,
+      "confusion_matrix": [
+        [
+          10,
+          0
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "f1": 0.0,
+      "logloss": 0.6432871866513397,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "3": {
+      "accuracy": 0.5555555555555556,
+      "auc": 1.0,
+      "confusion_matrix": [
+        [
+          10,
+          0
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "f1": 0.0,
+      "logloss": 0.6432871866513395,
+      "precision": 0.0,
+      "recall": 0.0
+    }
+  },
+  "dataset_rows": 90,
+  "feature_columns": [
+    "order_index",
+    "duration_sec",
+    "keyboard_dimension",
+    "keyboard_mask",
+    "issues_count",
+    "elapsed_seconds",
+    "rows_keyboard.parquet",
+    "rows_keyboard_events.parquet",
+    "rows_keyboard_windows.parquet",
+    "rows_mouse.parquet",
+    "rows_network.parquet",
+    "rows_markers.parquet",
+    "rows_frames.parquet",
+    "rows_pulse.parquet",
+    "rows_pulse_windows.parquet",
+    "rows_timeline.parquet",
+    "rows_browser_face.parquet",
+    "artifacts_keyboard.parquet",
+    "artifacts_keyboard_events.parquet",
+    "artifacts_keyboard_windows.parquet",
+    "artifacts_mouse.parquet",
+    "artifacts_network.parquet",
+    "artifacts_markers.parquet",
+    "artifacts_frames.parquet",
+    "artifacts_pulse.parquet",
+    "artifacts_pulse_windows.parquet",
+    "artifacts_timeline.parquet",
+    "artifacts_browser_face.parquet",
+    "artifacts_context.json",
+    "artifacts_video_summary.json",
+    "artifacts_parallel_validation.json"
+  ],
+  "gpus_used": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "regression": {
+    "0": {
+      "mae": 0.9349662367095366,
+      "mean_abs_error": 0.9349662367095366,
+      "r2": 0.3881923240627455,
+      "rmse": 1.217502282314317
+    },
+    "1": {
+      "mae": 0.9349662367095366,
+      "mean_abs_error": 0.9349662367095366,
+      "r2": 0.3881923240627455,
+      "rmse": 1.217502282314317
+    },
+    "2": {
+      "mae": 0.9349662367095366,
+      "mean_abs_error": 0.9349662367095366,
+      "r2": 0.3881923240627455,
+      "rmse": 1.217502282314317
+    },
+    "3": {
+      "mae": 0.9349662367095366,
+      "mean_abs_error": 0.9349662367095366,
+      "r2": 0.3881923240627455,
+      "rmse": 1.217502282314317
+    }
+  }
+}

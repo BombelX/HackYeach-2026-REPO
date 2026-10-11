@@ -1,17 +1,52 @@
-node_modules/
-dist/
-web/dist/
-__pycache__/
+# Raw data, recordings and derived participant/session data
+data/
+datasets/
+dataset/
+**/data/
+**/datasets/
+**/dataset/
+**/sessions/
+**/derived_video/
+**/aalto-136m/
+**/input_csv_mouse/
+**/sapimouse/user*/
+*.sqlite
+*.db
+*.jsonl
+training/artifacts/fusion/windows_*.pkl
+training/artifacts/mouse_boost/enrollment_profiles.parquet
+third-party/rPPG-Toolbox/model_outputs/
+third-party/rPPG-Toolbox/tools/output_signal_viz/sample_output.pickle
+
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+turn_secret
+
+# Environments, dependencies and generated build/cache files
 .venv/
 venv/
-*.pyc
-.env
-data/
-*.sqlite
-*.sqlite-journal
-.DS_Store
-Thumbs.db
-.vscode/
-*.webm
-*.mp4
-.cache/
+**/.venv/
+**/node_modules/
+**/dist/
+**/test-results/
+**/playwright-report/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+.pytest_cache/
+.ipynb_checkpoints/
+.impeccable/
+
+# Local environments and analysis outputs
+.venv*/
+*.log
+analyses/training/artifacts/fusion/windows_*.pkl
+analyses/training/artifacts/mouse_boost/enrollment_profiles.parquet
+
+# Session-level EDA outputs
+**/09_top_outlier_sessions.csv
+

@@ -1,0 +1,4 @@
+# Optional CPU installation for InsightFace face-A.
+insightface>=0.7.3,<0.8
+onnxruntime>=1.18,<2
+av>=16,<18

@@ -1,0 +1,17 @@
+{
+	admin off
+	auto_https off
+	default_sni {$PUBLIC_IP}
+}
+
+:{$PUBLIC_PORT} {
+	tls {$CERT} {$KEY}
+
+	redir /datacollection /datacollection/ 308
+	handle_path /datacollection/* {
+		reverse_proxy 127.0.0.1:{$API_PORT}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:{$WEBRTC_PORT}
+	}
+}

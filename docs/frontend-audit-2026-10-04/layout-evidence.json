@@ -1,0 +1,92 @@
+[
+  {
+    "name": "dashboard-focus",
+    "active": {
+      "tag": "BODY",
+      "text": "Przejdź do treściBank24 · środowisko demonstracyjneBankowość internetowa PomocAanna.demoWylogujPobie"
+    }
+  },
+  {
+    "route": "/app",
+    "width": 390,
+    "mainWidth": 340,
+    "grid": "minmax(0px, 1fr) 304px",
+    "clipped": [
+      {
+        "selector": "account-overview",
+        "right": 407,
+        "shellRight": 378
+      },
+      {
+        "selector": "month-summary",
+        "right": 407,
+        "shellRight": 378
+      },
+      {
+        "selector": "",
+        "right": 386,
+        "shellRight": 378
+      },
+      {
+        "selector": "",
+        "right": 386,
+        "shellRight": 378
+      },
+      {
+        "selector": "",
+        "right": 386,
+        "shellRight": 378
+      },
+      {
+        "selector": "",
+        "right": 386,
+        "shellRight": 378
+      },
+      {
+        "selector": "",
+        "right": 386,
+        "shellRight": 378
+      }
+    ]
+  },
+  {
+    "route": "/app/transfers/new",
+    "width": 390,
+    "mainWidth": 16,
+    "grid": "16px 304px",
+    "clipped": []
+  },
+  {
+    "route": "/app",
+    "width": 768,
+    "mainWidth": 662,
+    "grid": "minmax(0px, 1fr) 304px",
+    "clipped": []
+  },
+  {
+    "route": "/app/transfers/new",
+    "width": 768,
+    "mainWidth": 338,
+    "grid": "338px 304px",
+    "clipped": []
+  },
+  {
+    "route": "/app",
+    "width": 1024,
+    "mainWidth": 918,
+    "grid": "minmax(0px, 1fr) 304px",
+    "clipped": []
+  },
+  {
+    "route": "/app/transfers/new",
+    "width": 1024,
+    "mainWidth": 594,
+    "grid": "594px 304px",
+    "clipped": []
+  },
+  {
+    "name": "bell-click",
+    "result": "logs-out",
+    "url": "http://localhost:5181/study"
+  }
+]

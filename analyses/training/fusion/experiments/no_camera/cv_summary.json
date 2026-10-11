@@ -1,0 +1,1254 @@
+{
+  "params": 341202,
+  "config": {
+    "dim": 128,
+    "heads": 4,
+    "layers": 2,
+    "ff": 256,
+    "dropout": 0.1
+  },
+  "variant": "baseline",
+  "camera_off": true,
+  "weight_decay": 0.05,
+  "network_model": "fold_local_hgb_oof_train",
+  "network_config": {
+    "max_depth": 3,
+    "learning_rate": 0.06,
+    "max_iter": 250,
+    "min_samples_leaf": 8,
+    "l2_regularization": 1.0,
+    "random_state": 42
+  },
+  "dropout_p": {
+    "0": 0.1,
+    "1": 0.1,
+    "2": 0.3,
+    "3": 0.3,
+    "4": 0.2
+  },
+  "folds": 5,
+  "selection": "minimum balanced session-level validation BCE",
+  "review_target_recall_on_validation": 0.95,
+  "review_policy": "threshold selected on validation for scam owners AND impostors; alerts require human verification, not automatic blocking",
+  "max_epochs": 300,
+  "patience": 60,
+  "min_epochs": 20,
+  "seeds": 3,
+  "n_sessions": 108,
+  "n_people": 41,
+  "n_profiles": 36,
+  "summary": {
+    "nonowner_auc": {
+      "mean": 0.9608267798082049,
+      "std": 0.0368751763357864
+    },
+    "nonowner_ap": {
+      "mean": 0.9954911058936581,
+      "std": 0.004122854584422037
+    },
+    "nonowner_eer": {
+      "mean": 0.06417070818895436,
+      "std": 0.05281954427462351
+    },
+    "nonowner_auc_no_context": {
+      "mean": 0.720127311966643,
+      "std": 0.10131960477648544
+    },
+    "nonowner_eer_no_context": {
+      "mean": 0.3421527551780406,
+      "std": 0.08345033616891362
+    },
+    "pressure_auc": {
+      "mean": 0.7968074518074518,
+      "std": 0.11499344591276855
+    },
+    "pressure_ap": {
+      "mean": 0.6811810770928417,
+      "std": 0.14960051467745306
+    },
+    "pressure_auc_no_context": {
+      "mean": 0.7349147334147332,
+      "std": 0.10643841187966084
+    },
+    "nonowner_auc_no_camera": {
+      "mean": 0.9608267798082049,
+      "std": 0.0368751763357864
+    },
+    "pressure_auc_no_camera": {
+      "mean": 0.7968074518074518,
+      "std": 0.11499344591276855
+    },
+    "kb_cosine_baseline_auc": {
+      "mean": 0.72162958668789,
+      "std": 0.12141073980226774
+    },
+    "kb_cosine_baseline_eer": {
+      "mean": 0.35487947926823377,
+      "std": 0.11675619233619867
+    },
+    "fusion_auc_on_kb_subset": {
+      "mean": 0.9317765855406582,
+      "std": 0.09209488753672998
+    },
+    "fusion_no_context_auc_on_kb_subset": {
+      "mean": 0.6912930055716567,
+      "std": 0.12310273276805102
+    },
+    "review_threshold": {
+      "mean": 0.4669217531879743,
+      "std": 0.25296000708386196
+    },
+    "best_val_loss": {
+      "mean": 0.3430771447572624,
+      "std": 0.22134585655404754
+    },
+    "seconds": {
+      "mean": 37.86000000000001,
+      "std": 7.562697931294098
+    }
+  },
+  "best_epochs": [
+    20,
+    121,
+    56,
+    38,
+    21,
+    77,
+    52,
+    83,
+    38,
+    24,
+    47,
+    55,
+    32,
+    23,
+    40
+  ],
+  "folds_detail": [
+    {
+      "n_pairs": 203,
+      "n_nonowner": 183,
+      "n_owner": 20,
+      "n_pressure_pos": 5,
+      "n_pressure_neg": 15,
+      "nonowner_auc": 0.9907103825136612,
+      "nonowner_ap": 0.9990024107464166,
+      "nonowner_eer": 0.01912568306010931,
+      "nonowner_auc_no_context": 0.6710382513661202,
+      "nonowner_eer_no_context": 0.3525956284153005,
+      "pressure_auc": 0.7333333333333334,
+      "pressure_ap": 0.5047222222222222,
+      "pressure_auc_no_context": 0.6933333333333334,
+      "nonowner_auc_no_camera": 0.9907103825136612,
+      "pressure_auc_no_camera": 0.7333333333333334,
+      "kb_subset_pairs": 38,
+      "kb_cosine_baseline_auc": 0.6848484848484848,
+      "kb_cosine_baseline_eer": 0.23636363636363636,
+      "fusion_auc_on_kb_subset": 1.0,
+      "fusion_no_context_auc_on_kb_subset": 0.7090909090909091,
+      "review_threshold": 0.0567646250128746,
+      "review_counts": {
+        "scam_owner": {
+          "total": 5,
+          "flagged": 5,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "impostor": {
+          "total": 183,
+          "flagged": 183,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 15,
+          "flagged": 14,
+          "missed": 1,
+          "rate": 0.9333333333333333
+        }
+      },
+      "fold": 0,
+      "seed": 0,
+      "best_epoch": 20,
+      "trained_epochs": 80,
+      "best_val_loss": 0.9812562298029661,
+      "seconds": 25.6,
+      "test_people": [
+        "P-0015HXC",
+        "P-0028N3G",
+        "P-0032U9P",
+        "P-0044EU9",
+        "P-0086FVA",
+        "P-00917M2",
+        "P-00982FV",
+        "P-0099KZE",
+        "P-0107YDT"
+      ],
+      "val_people": [
+        "P-0017M2F",
+        "P-0026JYD",
+        "P-00274HX",
+        "P-0106EU9",
+        "P-0112Q5J"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 156,
+      "n_nonowner": 139,
+      "n_owner": 17,
+      "n_pressure_pos": 5,
+      "n_pressure_neg": 12,
+      "nonowner_auc": 0.9627592044011849,
+      "nonowner_ap": 0.9957687407349873,
+      "nonowner_eer": 0.028776978417266175,
+      "nonowner_auc_no_context": 0.8514600084638171,
+      "nonowner_eer_no_context": 0.23275497249259416,
+      "pressure_auc": 0.6666666666666667,
+      "pressure_ap": 0.47882352941176465,
+      "pressure_auc_no_context": 0.5666666666666667,
+      "nonowner_auc_no_camera": 0.9627592044011849,
+      "pressure_auc_no_camera": 0.6666666666666667,
+      "kb_subset_pairs": 31,
+      "kb_cosine_baseline_auc": 0.56,
+      "kb_cosine_baseline_eer": 0.47,
+      "fusion_auc_on_kb_subset": 0.8200000000000001,
+      "fusion_no_context_auc_on_kb_subset": 0.6799999999999999,
+      "review_threshold": 0.7961039543151855,
+      "review_counts": {
+        "scam_owner": {
+          "total": 5,
+          "flagged": 1,
+          "missed": 4,
+          "rate": 0.2
+        },
+        "impostor": {
+          "total": 139,
+          "flagged": 131,
+          "missed": 8,
+          "rate": 0.9424460431654677
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 12,
+          "flagged": 2,
+          "missed": 10,
+          "rate": 0.16666666666666666
+        }
+      },
+      "fold": 1,
+      "seed": 0,
+      "best_epoch": 121,
+      "trained_epochs": 181,
+      "best_val_loss": 0.12791945414210204,
+      "seconds": 53.2,
+      "test_people": [
+        "P-00274HX",
+        "P-0056ZEU",
+        "P-00718N3",
+        "P-0074VAQ",
+        "P-0087ZEU",
+        "P-0096XCS",
+        "P-0112Q5J",
+        "P-0116WBR"
+      ],
+      "val_people": [
+        "P-0017M2F",
+        "P-0026JYD",
+        "P-0028N3G",
+        "P-0086FVA",
+        "P-0101P4H",
+        "P-0106EU9"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 163,
+      "n_nonowner": 147,
+      "n_owner": 16,
+      "n_pressure_pos": 4,
+      "n_pressure_neg": 12,
+      "nonowner_auc": 0.9370748299319728,
+      "nonowner_ap": 0.9933425774207485,
+      "nonowner_eer": 0.07886904761904762,
+      "nonowner_auc_no_context": 0.5110544217687074,
+      "nonowner_eer_no_context": 0.5465561224489796,
+      "pressure_auc": 0.625,
+      "pressure_ap": 0.6394230769230769,
+      "pressure_auc_no_context": 0.6041666666666666,
+      "nonowner_auc_no_camera": 0.9370748299319728,
+      "pressure_auc_no_camera": 0.625,
+      "kb_subset_pairs": 48,
+      "kb_cosine_baseline_auc": 0.8465116279069768,
+      "kb_cosine_baseline_eer": 0.21627906976744185,
+      "fusion_auc_on_kb_subset": 0.9116279069767442,
+      "fusion_no_context_auc_on_kb_subset": 0.49302325581395345,
+      "review_threshold": 0.30964961647987366,
+      "review_counts": {
+        "scam_owner": {
+          "total": 4,
+          "flagged": 3,
+          "missed": 1,
+          "rate": 0.75
+        },
+        "impostor": {
+          "total": 147,
+          "flagged": 145,
+          "missed": 2,
+          "rate": 0.9863945578231292
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 12,
+          "flagged": 11,
+          "missed": 1,
+          "rate": 0.9166666666666666
+        }
+      },
+      "fold": 2,
+      "seed": 0,
+      "best_epoch": 56,
+      "trained_epochs": 116,
+      "best_val_loss": 0.4617311339825392,
+      "seconds": 44.6,
+      "test_people": [
+        "P-00829P4",
+        "P-0085WBR",
+        "P-0095DT8",
+        "P-0101P4H",
+        "P-0103S7M",
+        "P-0105VAQ",
+        "P-0106EU9",
+        "P-0108HXC"
+      ],
+      "val_people": [
+        "P-0017M2F",
+        "P-0026JYD",
+        "P-00274HX",
+        "P-0028N3G",
+        "P-0086FVA",
+        "P-0112Q5J"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 124,
+      "n_nonowner": 109,
+      "n_owner": 15,
+      "n_pressure_pos": 3,
+      "n_pressure_neg": 12,
+      "nonowner_auc": 0.9773700305810398,
+      "nonowner_ap": 0.9970729037183401,
+      "nonowner_eer": 0.022935779816513735,
+      "nonowner_auc_no_context": 0.8807339449541285,
+      "nonowner_eer_no_context": 0.21009174311926607,
+      "pressure_auc": 0.9722222222222222,
+      "pressure_ap": 0.9166666666666665,
+      "pressure_auc_no_context": 0.7777777777777778,
+      "nonowner_auc_no_camera": 0.9773700305810398,
+      "pressure_auc_no_camera": 0.9722222222222222,
+      "kb_subset_pairs": 42,
+      "kb_cosine_baseline_auc": 0.9154411764705882,
+      "kb_cosine_baseline_eer": 0.22794117647058826,
+      "fusion_auc_on_kb_subset": 1.0,
+      "fusion_no_context_auc_on_kb_subset": 0.9227941176470589,
+      "review_threshold": 0.15524201095104218,
+      "review_counts": {
+        "scam_owner": {
+          "total": 3,
+          "flagged": 3,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "impostor": {
+          "total": 109,
+          "flagged": 109,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 12,
+          "flagged": 7,
+          "missed": 5,
+          "rate": 0.5833333333333334
+        }
+      },
+      "fold": 3,
+      "seed": 0,
+      "best_epoch": 38,
+      "trained_epochs": 98,
+      "best_val_loss": 0.4532967694103718,
+      "seconds": 32.3,
+      "test_people": [
+        "P-0017M2F",
+        "P-0031AQ5",
+        "P-0046HXC",
+        "P-0050Q5J",
+        "P-0052T8N",
+        "P-00584HX",
+        "P-00607M2",
+        "P-0110M2F"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-00274HX",
+        "P-0028N3G",
+        "P-0086FVA",
+        "P-0106EU9",
+        "P-0112Q5J"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 116,
+      "n_nonowner": 103,
+      "n_owner": 13,
+      "n_pressure_pos": 2,
+      "n_pressure_neg": 11,
+      "nonowner_auc": 0.953696788648245,
+      "nonowner_ap": 0.9944528956884525,
+      "nonowner_eer": 0.0724421209858103,
+      "nonowner_auc_no_context": 0.690067214339059,
+      "nonowner_eer_no_context": 0.3140403286034354,
+      "pressure_auc": 0.9545454545454545,
+      "pressure_ap": 0.8333333333333333,
+      "pressure_auc_no_context": 0.9090909090909091,
+      "nonowner_auc_no_camera": 0.953696788648245,
+      "pressure_auc_no_camera": 0.9545454545454545,
+      "kb_subset_pairs": 5,
+      "kb_cosine_baseline_auc": 0.8333333333333333,
+      "kb_cosine_baseline_eer": 0.4166666666666667,
+      "fusion_auc_on_kb_subset": 1.0,
+      "fusion_no_context_auc_on_kb_subset": 0.8333333333333333,
+      "review_threshold": 0.3596840798854828,
+      "review_counts": {
+        "scam_owner": {
+          "total": 2,
+          "flagged": 2,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "impostor": {
+          "total": 103,
+          "flagged": 103,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 11,
+          "flagged": 7,
+          "missed": 4,
+          "rate": 0.6363636363636364
+        }
+      },
+      "fold": 4,
+      "seed": 0,
+      "best_epoch": 21,
+      "trained_epochs": 81,
+      "best_val_loss": 0.2927825069054961,
+      "seconds": 34.0,
+      "test_people": [
+        "P-00163GW",
+        "P-0026JYD",
+        "P-00408N3",
+        "P-0045YDT",
+        "P-0048M2F",
+        "P-0061R6K",
+        "P-00672FV",
+        "P-0092R6K"
+      ],
+      "val_people": [
+        "P-0017M2F",
+        "P-00274HX",
+        "P-0028N3G",
+        "P-0086FVA",
+        "P-0106EU9",
+        "P-0112Q5J"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 126,
+      "n_nonowner": 113,
+      "n_owner": 13,
+      "n_pressure_pos": 2,
+      "n_pressure_neg": 11,
+      "nonowner_auc": 1.0,
+      "nonowner_ap": 1.0,
+      "nonowner_eer": 0.0,
+      "nonowner_auc_no_context": 0.7297481279782164,
+      "nonowner_eer_no_context": 0.3781484002722941,
+      "pressure_auc": 0.7727272727272727,
+      "pressure_ap": 0.6428571428571428,
+      "pressure_auc_no_context": 0.7727272727272727,
+      "nonowner_auc_no_camera": 1.0,
+      "pressure_auc_no_camera": 0.7727272727272727,
+      "kb_subset_pairs": 29,
+      "kb_cosine_baseline_auc": 0.875,
+      "kb_cosine_baseline_eer": 0.2041666666666667,
+      "fusion_auc_on_kb_subset": 1.0,
+      "fusion_no_context_auc_on_kb_subset": 0.5916666666666667,
+      "review_threshold": 0.2668716311454773,
+      "review_counts": {
+        "scam_owner": {
+          "total": 2,
+          "flagged": 1,
+          "missed": 1,
+          "rate": 0.5
+        },
+        "impostor": {
+          "total": 113,
+          "flagged": 113,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 11,
+          "flagged": 4,
+          "missed": 7,
+          "rate": 0.36363636363636365
+        }
+      },
+      "fold": 0,
+      "seed": 1,
+      "best_epoch": 77,
+      "trained_epochs": 137,
+      "best_val_loss": 0.27114463597536087,
+      "seconds": 46.7,
+      "test_people": [
+        "P-0017M2F",
+        "P-0026JYD",
+        "P-00274HX",
+        "P-0028N3G",
+        "P-0044EU9",
+        "P-00584HX",
+        "P-00672FV",
+        "P-0085WBR",
+        "P-0106EU9"
+      ],
+      "val_people": [
+        "P-0015HXC",
+        "P-0031AQ5",
+        "P-0045YDT",
+        "P-0048M2F",
+        "P-0116WBR"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 170,
+      "n_nonowner": 151,
+      "n_owner": 19,
+      "n_pressure_pos": 6,
+      "n_pressure_neg": 13,
+      "nonowner_auc": 0.969327291739282,
+      "nonowner_ap": 0.9963401502623355,
+      "nonowner_eer": 0.026490066225165587,
+      "nonowner_auc_no_context": 0.658766120599512,
+      "nonowner_eer_no_context": 0.3729522481700941,
+      "pressure_auc": 0.7820512820512819,
+      "pressure_ap": 0.7754901960784314,
+      "pressure_auc_no_context": 0.7692307692307693,
+      "nonowner_auc_no_camera": 0.969327291739282,
+      "pressure_auc_no_camera": 0.7820512820512819,
+      "kb_subset_pairs": 47,
+      "kb_cosine_baseline_auc": 0.7761904761904761,
+      "kb_cosine_baseline_eer": 0.37857142857142856,
+      "fusion_auc_on_kb_subset": 1.0,
+      "fusion_no_context_auc_on_kb_subset": 0.7095238095238096,
+      "review_threshold": 0.5536036491394043,
+      "review_counts": {
+        "scam_owner": {
+          "total": 6,
+          "flagged": 4,
+          "missed": 2,
+          "rate": 0.6666666666666666
+        },
+        "impostor": {
+          "total": 151,
+          "flagged": 144,
+          "missed": 7,
+          "rate": 0.9536423841059603
+        },
+        "natural_intruder": {
+          "total": 1,
+          "flagged": 1,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "normal_owner": {
+          "total": 13,
+          "flagged": 4,
+          "missed": 9,
+          "rate": 0.3076923076923077
+        }
+      },
+      "fold": 1,
+      "seed": 1,
+      "best_epoch": 52,
+      "trained_epochs": 112,
+      "best_val_loss": 0.3080510103609413,
+      "seconds": 43.2,
+      "test_people": [
+        "P-0015HXC",
+        "P-00163GW",
+        "P-0031AQ5",
+        "P-0032U9P",
+        "P-00607M2",
+        "P-0092R6K",
+        "P-0103S7M",
+        "P-0107YDT"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-0044EU9",
+        "P-0045YDT",
+        "P-0048M2F",
+        "P-00982FV",
+        "P-0116WBR"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 110,
+      "n_nonowner": 97,
+      "n_owner": 13,
+      "n_pressure_pos": 2,
+      "n_pressure_neg": 11,
+      "nonowner_auc": 0.9881046788263284,
+      "nonowner_ap": 0.9984505008567219,
+      "nonowner_eer": 0.06423473433782714,
+      "nonowner_auc_no_context": 0.8469468675654243,
+      "nonowner_eer_no_context": 0.22878667724028548,
+      "pressure_auc": 0.8636363636363635,
+      "pressure_ap": 0.5,
+      "pressure_auc_no_context": 0.8181818181818181,
+      "nonowner_auc_no_camera": 0.9881046788263284,
+      "pressure_auc_no_camera": 0.8636363636363635,
+      "kb_subset_pairs": 1,
+      "kb_cosine_baseline_auc": NaN,
+      "kb_cosine_baseline_eer": NaN,
+      "fusion_auc_on_kb_subset": NaN,
+      "fusion_no_context_auc_on_kb_subset": NaN,
+      "review_threshold": 0.9476443529129028,
+      "review_counts": {
+        "scam_owner": {
+          "total": 2,
+          "flagged": 1,
+          "missed": 1,
+          "rate": 0.5
+        },
+        "impostor": {
+          "total": 97,
+          "flagged": 91,
+          "missed": 6,
+          "rate": 0.9381443298969072
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 11,
+          "flagged": 2,
+          "missed": 9,
+          "rate": 0.18181818181818182
+        }
+      },
+      "fold": 2,
+      "seed": 1,
+      "best_epoch": 83,
+      "trained_epochs": 143,
+      "best_val_loss": 0.08177962619811296,
+      "seconds": 42.4,
+      "test_people": [
+        "P-0046HXC",
+        "P-0048M2F",
+        "P-0052T8N",
+        "P-0056ZEU",
+        "P-00718N3",
+        "P-0086FVA",
+        "P-00982FV",
+        "P-0105VAQ"
+      ],
+      "val_people": [
+        "P-0015HXC",
+        "P-0026JYD",
+        "P-0031AQ5",
+        "P-0044EU9",
+        "P-0045YDT",
+        "P-0116WBR"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 163,
+      "n_nonowner": 145,
+      "n_owner": 18,
+      "n_pressure_pos": 5,
+      "n_pressure_neg": 13,
+      "nonowner_auc": 0.9827586206896551,
+      "nonowner_ap": 0.9979321593632077,
+      "nonowner_eer": 0.08659003831417625,
+      "nonowner_auc_no_context": 0.671264367816092,
+      "nonowner_eer_no_context": 0.38409961685823757,
+      "pressure_auc": 0.7076923076923077,
+      "pressure_ap": 0.6353646353646354,
+      "pressure_auc_no_context": 0.7692307692307692,
+      "nonowner_auc_no_camera": 0.9827586206896551,
+      "pressure_auc_no_camera": 0.7076923076923077,
+      "kb_subset_pairs": 39,
+      "kb_cosine_baseline_auc": 0.5040322580645161,
+      "kb_cosine_baseline_eer": 0.6048387096774194,
+      "fusion_auc_on_kb_subset": 0.9274193548387096,
+      "fusion_no_context_auc_on_kb_subset": 0.5806451612903226,
+      "review_threshold": 0.41860049962997437,
+      "review_counts": {
+        "scam_owner": {
+          "total": 5,
+          "flagged": 2,
+          "missed": 3,
+          "rate": 0.4
+        },
+        "impostor": {
+          "total": 145,
+          "flagged": 141,
+          "missed": 4,
+          "rate": 0.9724137931034482
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 13,
+          "flagged": 2,
+          "missed": 11,
+          "rate": 0.15384615384615385
+        }
+      },
+      "fold": 3,
+      "seed": 1,
+      "best_epoch": 38,
+      "trained_epochs": 98,
+      "best_val_loss": 0.19151708856225014,
+      "seconds": 34.3,
+      "test_people": [
+        "P-00408N3",
+        "P-0045YDT",
+        "P-0050Q5J",
+        "P-0061R6K",
+        "P-0096XCS",
+        "P-0099KZE",
+        "P-0108HXC",
+        "P-0112Q5J"
+      ],
+      "val_people": [
+        "P-0015HXC",
+        "P-0026JYD",
+        "P-0031AQ5",
+        "P-0044EU9",
+        "P-0048M2F",
+        "P-0116WBR"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 183,
+      "n_nonowner": 165,
+      "n_owner": 18,
+      "n_pressure_pos": 4,
+      "n_pressure_neg": 14,
+      "nonowner_auc": 0.8531986531986532,
+      "nonowner_ap": 0.9841035412934219,
+      "nonowner_eer": 0.16818181818181815,
+      "nonowner_auc_no_context": 0.6144781144781145,
+      "nonowner_eer_no_context": 0.35505050505050506,
+      "pressure_auc": 0.6428571428571429,
+      "pressure_ap": 0.5166666666666666,
+      "pressure_auc_no_context": 0.625,
+      "nonowner_auc_no_camera": 0.8531986531986532,
+      "pressure_auc_no_camera": 0.6428571428571429,
+      "kb_subset_pairs": 64,
+      "kb_cosine_baseline_auc": 0.7276785714285714,
+      "kb_cosine_baseline_eer": 0.38392857142857145,
+      "fusion_auc_on_kb_subset": 0.6674107142857143,
+      "fusion_no_context_auc_on_kb_subset": 0.7142857142857142,
+      "review_threshold": 0.47407257556915283,
+      "review_counts": {
+        "scam_owner": {
+          "total": 4,
+          "flagged": 2,
+          "missed": 2,
+          "rate": 0.5
+        },
+        "impostor": {
+          "total": 165,
+          "flagged": 139,
+          "missed": 26,
+          "rate": 0.8424242424242424
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 14,
+          "flagged": 7,
+          "missed": 7,
+          "rate": 0.5
+        }
+      },
+      "fold": 4,
+      "seed": 1,
+      "best_epoch": 24,
+      "trained_epochs": 84,
+      "best_val_loss": 0.4120146743953228,
+      "seconds": 28.6,
+      "test_people": [
+        "P-0074VAQ",
+        "P-00829P4",
+        "P-0087ZEU",
+        "P-00917M2",
+        "P-0095DT8",
+        "P-0101P4H",
+        "P-0110M2F",
+        "P-0116WBR"
+      ],
+      "val_people": [
+        "P-0015HXC",
+        "P-0026JYD",
+        "P-0031AQ5",
+        "P-0044EU9",
+        "P-0045YDT",
+        "P-0048M2F"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 226,
+      "n_nonowner": 206,
+      "n_owner": 20,
+      "n_pressure_pos": 6,
+      "n_pressure_neg": 14,
+      "nonowner_auc": 0.9759708737864078,
+      "nonowner_ap": 0.9977310207036618,
+      "nonowner_eer": 0.05169902912621358,
+      "nonowner_auc_no_context": 0.6354368932038835,
+      "nonowner_eer_no_context": 0.39417475728155343,
+      "pressure_auc": 0.7142857142857143,
+      "pressure_ap": 0.6382575757575757,
+      "pressure_auc_no_context": 0.5952380952380952,
+      "nonowner_auc_no_camera": 0.9759708737864078,
+      "pressure_auc_no_camera": 0.7142857142857143,
+      "kb_subset_pairs": 62,
+      "kb_cosine_baseline_auc": 0.7543859649122807,
+      "kb_cosine_baseline_eer": 0.24035087719298245,
+      "fusion_auc_on_kb_subset": 0.9894736842105263,
+      "fusion_no_context_auc_on_kb_subset": 0.5298245614035088,
+      "review_threshold": 0.8915998935699463,
+      "review_counts": {
+        "scam_owner": {
+          "total": 6,
+          "flagged": 1,
+          "missed": 5,
+          "rate": 0.16666666666666666
+        },
+        "impostor": {
+          "total": 206,
+          "flagged": 196,
+          "missed": 10,
+          "rate": 0.9514563106796117
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 14,
+          "flagged": 1,
+          "missed": 13,
+          "rate": 0.07142857142857142
+        }
+      },
+      "fold": 0,
+      "seed": 2,
+      "best_epoch": 47,
+      "trained_epochs": 107,
+      "best_val_loss": 0.11489097448065877,
+      "seconds": 42.3,
+      "test_people": [
+        "P-00163GW",
+        "P-00718N3",
+        "P-0074VAQ",
+        "P-0085WBR",
+        "P-0092R6K",
+        "P-0095DT8",
+        "P-0101P4H",
+        "P-0103S7M",
+        "P-0108HXC"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-00408N3",
+        "P-0044EU9",
+        "P-00607M2",
+        "P-0110M2F"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 136,
+      "n_nonowner": 121,
+      "n_owner": 15,
+      "n_pressure_pos": 3,
+      "n_pressure_neg": 12,
+      "nonowner_auc": 0.9581267217630856,
+      "nonowner_ap": 0.9951266032297662,
+      "nonowner_eer": 0.037190082644628086,
+      "nonowner_auc_no_context": 0.8308539944903581,
+      "nonowner_eer_no_context": 0.2988980716253443,
+      "pressure_auc": 0.8055555555555556,
+      "pressure_ap": 0.7666666666666666,
+      "pressure_auc_no_context": 0.75,
+      "nonowner_auc_no_camera": 0.9581267217630856,
+      "pressure_auc_no_camera": 0.8055555555555556,
+      "kb_subset_pairs": 30,
+      "kb_cosine_baseline_auc": 0.639751552795031,
+      "kb_cosine_baseline_eer": 0.40993788819875776,
+      "fusion_auc_on_kb_subset": 0.9254658385093167,
+      "fusion_no_context_auc_on_kb_subset": 0.8571428571428572,
+      "review_threshold": 0.6905307173728943,
+      "review_counts": {
+        "scam_owner": {
+          "total": 3,
+          "flagged": 2,
+          "missed": 1,
+          "rate": 0.6666666666666666
+        },
+        "impostor": {
+          "total": 121,
+          "flagged": 112,
+          "missed": 9,
+          "rate": 0.9256198347107438
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 12,
+          "flagged": 0,
+          "missed": 12,
+          "rate": 0.0
+        }
+      },
+      "fold": 1,
+      "seed": 2,
+      "best_epoch": 55,
+      "trained_epochs": 115,
+      "best_val_loss": 0.1483461051248014,
+      "seconds": 33.9,
+      "test_people": [
+        "P-00408N3",
+        "P-0045YDT",
+        "P-0050Q5J",
+        "P-0052T8N",
+        "P-00829P4",
+        "P-0105VAQ",
+        "P-0110M2F",
+        "P-0112Q5J"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-0031AQ5",
+        "P-0044EU9",
+        "P-00607M2",
+        "P-0085WBR",
+        "P-0103S7M"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 150,
+      "n_nonowner": 133,
+      "n_owner": 17,
+      "n_pressure_pos": 4,
+      "n_pressure_neg": 13,
+      "nonowner_auc": 0.9115435647943387,
+      "nonowner_ap": 0.9889420390119941,
+      "nonowner_eer": 0.16718266253869973,
+      "nonowner_auc_no_context": 0.6554621848739496,
+      "nonowner_eer_no_context": 0.43520566121185317,
+      "pressure_auc": 0.8653846153846154,
+      "pressure_ap": 0.6916666666666667,
+      "pressure_auc_no_context": 0.6923076923076923,
+      "nonowner_auc_no_camera": 0.9115435647943387,
+      "pressure_auc_no_camera": 0.8653846153846154,
+      "kb_subset_pairs": 62,
+      "kb_cosine_baseline_auc": 0.6121593291404612,
+      "kb_cosine_baseline_eer": 0.4392033542976939,
+      "fusion_auc_on_kb_subset": 0.9161425576519917,
+      "fusion_no_context_auc_on_kb_subset": 0.6247379454926625,
+      "review_threshold": 0.3904585540294647,
+      "review_counts": {
+        "scam_owner": {
+          "total": 4,
+          "flagged": 3,
+          "missed": 1,
+          "rate": 0.75
+        },
+        "impostor": {
+          "total": 133,
+          "flagged": 121,
+          "missed": 12,
+          "rate": 0.9097744360902256
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 13,
+          "flagged": 2,
+          "missed": 11,
+          "rate": 0.15384615384615385
+        }
+      },
+      "fold": 2,
+      "seed": 2,
+      "best_epoch": 32,
+      "trained_epochs": 92,
+      "best_val_loss": 0.5647895857691765,
+      "seconds": 34.8,
+      "test_people": [
+        "P-0031AQ5",
+        "P-0048M2F",
+        "P-00584HX",
+        "P-00607M2",
+        "P-0061R6K",
+        "P-0087ZEU",
+        "P-0096XCS",
+        "P-0107YDT"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-00408N3",
+        "P-0044EU9",
+        "P-0085WBR",
+        "P-0103S7M",
+        "P-0110M2F"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 150,
+      "n_nonowner": 133,
+      "n_owner": 17,
+      "n_pressure_pos": 4,
+      "n_pressure_neg": 13,
+      "nonowner_auc": 0.9526758071649712,
+      "nonowner_ap": 0.9942204911464392,
+      "nonowner_eer": 0.1333480760725343,
+      "nonowner_auc_no_context": 0.789031402034498,
+      "nonowner_eer_no_context": 0.29743476337903585,
+      "pressure_auc": 0.8461538461538463,
+      "pressure_ap": 0.6777777777777778,
+      "pressure_auc_no_context": 0.7307692307692307,
+      "nonowner_auc_no_camera": 0.9526758071649712,
+      "pressure_auc_no_camera": 0.8461538461538463,
+      "kb_subset_pairs": 32,
+      "kb_cosine_baseline_auc": 0.6518518518518519,
+      "kb_cosine_baseline_eer": 0.3851851851851852,
+      "fusion_auc_on_kb_subset": 0.9555555555555555,
+      "fusion_no_context_auc_on_kb_subset": 0.7407407407407408,
+      "review_threshold": 0.30379757285118103,
+      "review_counts": {
+        "scam_owner": {
+          "total": 4,
+          "flagged": 4,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "impostor": {
+          "total": 133,
+          "flagged": 127,
+          "missed": 6,
+          "rate": 0.9548872180451128
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 13,
+          "flagged": 5,
+          "missed": 8,
+          "rate": 0.38461538461538464
+        }
+      },
+      "fold": 3,
+      "seed": 2,
+      "best_epoch": 23,
+      "trained_epochs": 83,
+      "best_val_loss": 0.43820300325751305,
+      "seconds": 28.8,
+      "test_people": [
+        "P-0015HXC",
+        "P-0032U9P",
+        "P-0044EU9",
+        "P-00917M2",
+        "P-00982FV",
+        "P-0099KZE",
+        "P-0106EU9",
+        "P-0116WBR"
+      ],
+      "val_people": [
+        "P-0026JYD",
+        "P-00408N3",
+        "P-00607M2",
+        "P-0085WBR",
+        "P-0103S7M",
+        "P-0110M2F"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    },
+    {
+      "n_pairs": 103,
+      "n_nonowner": 91,
+      "n_owner": 12,
+      "n_pressure_pos": 2,
+      "n_pressure_neg": 10,
+      "nonowner_auc": 0.9990842490842491,
+      "nonowner_ap": 0.99988055422838,
+      "nonowner_eer": 0.005494505494505475,
+      "nonowner_auc_no_context": 0.7655677655677656,
+      "nonowner_eer_no_context": 0.33150183150183155,
+      "pressure_auc": 1.0,
+      "pressure_ap": 1.0,
+      "pressure_auc_no_context": 0.9500000000000001,
+      "nonowner_auc_no_camera": 0.9990842490842491,
+      "pressure_auc_no_camera": 1.0,
+      "kb_subset_pairs": 0,
+      "kb_cosine_baseline_auc": NaN,
+      "kb_cosine_baseline_eer": NaN,
+      "fusion_auc_on_kb_subset": NaN,
+      "fusion_no_context_auc_on_kb_subset": NaN,
+      "review_threshold": 0.3892025649547577,
+      "review_counts": {
+        "scam_owner": {
+          "total": 2,
+          "flagged": 2,
+          "missed": 0,
+          "rate": 1.0
+        },
+        "impostor": {
+          "total": 91,
+          "flagged": 90,
+          "missed": 1,
+          "rate": 0.989010989010989
+        },
+        "natural_intruder": {
+          "total": 0,
+          "flagged": 0,
+          "missed": 0,
+          "rate": null
+        },
+        "normal_owner": {
+          "total": 10,
+          "flagged": 4,
+          "missed": 6,
+          "rate": 0.4
+        }
+      },
+      "fold": 4,
+      "seed": 2,
+      "best_epoch": 40,
+      "trained_epochs": 100,
+      "best_val_loss": 0.29843437299132347,
+      "seconds": 43.2,
+      "test_people": [
+        "P-0017M2F",
+        "P-0026JYD",
+        "P-00274HX",
+        "P-0028N3G",
+        "P-0046HXC",
+        "P-0056ZEU",
+        "P-00672FV",
+        "P-0086FVA"
+      ],
+      "val_people": [
+        "P-00408N3",
+        "P-0044EU9",
+        "P-00607M2",
+        "P-0085WBR",
+        "P-0103S7M",
+        "P-0110M2F"
+      ],
+      "n_train_people": 27,
+      "network_model": "fold_local_hgb"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+aiohttp>=3.10,<4
+aiortc>=1.14,<2
+numpy
+scipy
+torch
+opencv-contrib-python
+mediapipe
+Pillow>=10,<13
+pandas>=2.2.0
+pyarrow>=17.0.0
+scikit-learn>=1.5,<2
